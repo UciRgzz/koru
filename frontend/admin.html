@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Administración</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="admin-body">
+  <header class="header">
+    <div class="header-content">
+      <div class="header-logo">
+        <img src="img/Koru_logo.jpeg" alt="KORU" onerror="this.style.display='none'" />
+        <span class="logo-text">KORU</span>
+      </div>
+      <div class="header-right">
+        <span class="estado-conexion" id="estadoConexion">⚪ Conectando...</span>
+        <span class="fecha-hora" id="fechaHora"></span>
+        <span id="usuarioInfo" style="font-size:.85rem;opacity:.85"></span>
+        <nav class="admin-nav">
+          <button class="tab-btn active" onclick="mostrarTab('tablero', this)">📊 Tablero</button>
+          <button class="tab-btn" onclick="mostrarTab('pedidos', this)">📋 Pedidos</button>
+          <button class="tab-btn" onclick="mostrarTab('comprobantes', this)">🧾 Comprobantes</button>
+          <button class="tab-btn" onclick="cerrarSesion()" style="background:rgba(231,76,60,.5)">🚪 Salir</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- TAB: Tablero en tiempo real -->
+    <section class="tab-content active" id="tabTablero">
+      <div id="statsBar" class="stats-bar"></div>
+      <div class="cocina-main" style="min-height:calc(100vh - 80px)">
+
+        <section class="cocina-col">
+          <div class="col-header pendiente-header">
+            <h2>⏳ Pendientes</h2>
+            <span class="col-count" id="countPendiente">0</span>
+          </div>
+          <div class="cocina-cards" id="colPendiente">
+            <p class="no-pedidos-light">Sin pedidos pendientes</p>
+          </div>
+        </section>
+
+        <section class="cocina-col">
+          <div class="col-header preparacion-header">
+            <h2>🔥 En Preparación</h2>
+            <span class="col-count" id="countPreparacion">0</span>
+          </div>
+          <div class="cocina-cards" id="colPreparacion">
+            <p class="no-pedidos-light">Nada en preparación</p>
+          </div>
+        </section>
+
+        <section class="cocina-col">
+          <div class="col-header listo-header">
+            <h2>✅ Listos</h2>
+            <span class="col-count" id="countListo">0</span>
+          </div>
+          <div class="cocina-cards" id="colListo">
+            <p class="no-pedidos-light">Nada listo aún</p>
+          </div>
+        </section>
+
+        <section class="cocina-col">
+          <div class="col-header" style="background:linear-gradient(135deg,#555,#777)">
+            <h2>📦 Entregados hoy</h2>
+            <span class="col-count" id="countEntregado">0</span>
+          </div>
+          <div class="cocina-cards" id="colEntregado">
+            <p class="no-pedidos-light">Sin entregas aún</p>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+    <!-- TAB: Pedidos -->
+    <section class="tab-content" id="tabPedidos">
+      <div class="filtros-bar">
+        <h2>Historial de pedidos</h2>
+        <div class="filtros">
+          <input type="date" id="filtroPedidoFecha" onchange="cargarPedidos()" />
+          <select id="filtroPedidoEstado" onchange="cargarPedidos()">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="en_preparacion">En preparación</option>
+            <option value="listo">Listos</option>
+            <option value="entregado">Entregados</option>
+            <option value="cancelado">Cancelados</option>
+          </select>
+          <button class="btn-primary" onclick="cargarPedidos()">🔄 Actualizar</button>
+        </div>
+      </div>
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>N° Pedido</th>
+              <th>Cliente</th>
+              <th>Método Pago</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Hora</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="bodyPedidos">
+            <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: Comprobantes de transferencia -->
+    <section class="tab-content" id="tabComprobantes">
+      <div class="filtros-bar">
+        <h2>🧾 Comprobantes de Transferencia</h2>
+        <div class="filtros">
+          <input type="date" id="filtroCompFecha" onchange="cargarComprobantes()" />
+          <button class="btn-primary" onclick="cargarComprobantes()">🔄 Actualizar</button>
+        </div>
+      </div>
+      <div class="resumen-dia" id="resumenDia"></div>
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>N° Pedido</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Comprobante</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="bodyComprobantes">
+            <tr><td colspan="7" class="text-center">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal detalle de pedido -->
+  <div class="modal" id="modalDetalle">
+    <div class="modal-content modal-grande">
+      <div class="modal-header">
+        <h2 id="modalTitulo">Detalle del Pedido</h2>
+        <button onclick="cerrarModalDetalle()" class="btn-cerrar">✕</button>
+      </div>
+      <div id="modalCuerpo"></div>
+      <div class="modal-footer">
+        <div class="estado-acciones" id="estadoAcciones"></div>
+        <button onclick="cerrarModalDetalle()" class="btn-secondary">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plantilla oculta del comprobante imagen -->
+  <div id="reciboRender" style="position:fixed;left:-9999px;top:0;z-index:-1;pointer-events:none">
+    <div class="recibo-card">
+      <div class="recibo-header">
+        <img id="reciboLogo" src="img/Koru_logo.jpeg" alt="KORU" crossorigin="anonymous" />
+        <h2>KORU</h2>
+        <p>Tapiocas Estilo Sago Tailandés</p>
+      </div>
+      <div class="recibo-numero" id="reciboNumero"></div>
+      <div class="recibo-fecha"  id="reciboFecha"></div>
+      <div class="recibo-separator"></div>
+      <div class="recibo-datos"  id="reciboDatos"></div>
+      <div class="recibo-separator dashed"></div>
+      <div class="recibo-items"  id="reciboItems"></div>
+      <div class="recibo-separator"></div>
+      <div id="reciboTotal"></div>
+      <div class="recibo-footer">¡Gracias por tu compra! 🧋<br>Vuelve pronto · KORU</div>
+    </div>
+  </div>
+
+  <!-- Modal comprobante imagen -->
+  <div class="modal" id="modalComprobante">
+    <div class="modal-content" style="max-width:420px;text-align:center">
+      <div class="modal-header">
+        <h2>🧾 Comprobante generado</h2>
+        <button onclick="cerrarModalComprobante()" class="btn-cerrar">✕</button>
+      </div>
+      <div id="reciboPreview" style="margin:1rem 0;display:flex;justify-content:center;overflow:auto;max-height:65vh"></div>
+      <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;padding-top:.5rem">
+        <button class="btn-secondary" id="btnDescargarComp">⬇ Descargar</button>
+        <button id="btnEnviarWA" style="background:#25D366;color:white;border:none;padding:.55rem 1.3rem;border-radius:50px;cursor:pointer;font-size:.88rem;font-weight:600;font-family:Poppins,sans-serif;box-shadow:0 3px 12px rgba(37,211,102,.4)">📱 Enviar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

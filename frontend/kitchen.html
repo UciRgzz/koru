@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Cocina</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="cocina-body">
+  <header class="header">
+    <div class="header-content">
+      <h1>🍳 Panel de Cocina</h1>
+      <div class="header-right">
+        <span class="estado-conexion" id="estadoConexion">⚪ Conectando...</span>
+        <span class="fecha-hora" id="fechaHora"></span>
+        <button onclick="cerrarSesion()" style="background:rgba(231,76,60,.4);color:white;border:none;padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.85rem">🚪 Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="cocina-main">
+    <!-- Columna: Pendientes / Confirmados -->
+    <section class="cocina-col">
+      <div class="col-header pendiente-header">
+        <h2>⏳ Pendientes</h2>
+        <span class="col-count" id="countPendiente">0</span>
+      </div>
+      <div class="cocina-cards" id="colPendiente">
+        <p class="no-pedidos">Sin pedidos pendientes</p>
+      </div>
+    </section>
+
+    <!-- Columna: En preparación -->
+    <section class="cocina-col">
+      <div class="col-header preparacion-header">
+        <h2>🔥 En Preparación</h2>
+        <span class="col-count" id="countPreparacion">0</span>
+      </div>
+      <div class="cocina-cards" id="colPreparacion">
+        <p class="no-pedidos">Nada en preparación</p>
+      </div>
+    </section>
+
+    <!-- Columna: Listos -->
+    <section class="cocina-col">
+      <div class="col-header listo-header">
+        <h2>✅ Listos para Entregar</h2>
+        <span class="col-count" id="countListo">0</span>
+      </div>
+      <div class="cocina-cards" id="colListo">
+        <p class="no-pedidos">Nada listo aún</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sonido de alerta -->
+  <audio id="alertaSonido" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA..." type="audio/wav" />
+  </audio>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/kitchen.js"></script>
+</body>
+</html>

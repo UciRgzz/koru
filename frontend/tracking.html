@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KORU – Seguimiento de Pedido</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body { background: var(--gray-50); }
+
+    /* ── Banner "Listo" ─────────────────────────────────────── */
+    #bannerListo {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      background: linear-gradient(135deg, var(--pink), var(--mango));
+      color: white;
+      text-align: center;
+      padding: 1.1rem 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 20px rgba(244,165,43,.4);
+      animation: bannerDrop .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    #bannerListo.visible { display: block; }
+    @keyframes bannerDrop {
+      from { transform: translateY(-100%); }
+      to   { transform: translateY(0); }
+    }
+
+    /* ── Contenido principal ────────────────────────────────── */
+    .tracking-main {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 1.5rem 1.2rem 3rem;
+    }
+
+    /* ── Card ───────────────────────────────────────────────── */
+    .tracking-card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .tracking-card-top {
+      background: linear-gradient(135deg, #0F8A84, #2A9D8F, #3DBDB7);
+      padding: 1.4rem 1.6rem;
+      color: white;
+    }
+    .tracking-card-top .saludo {
+      font-size: .88rem;
+      opacity: .85;
+      margin-bottom: .15rem;
+    }
+    .tracking-card-top h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: .1rem;
+    }
+    .tracking-numero {
+      font-size: .82rem;
+      opacity: .8;
+      font-weight: 500;
+      letter-spacing: .03em;
+    }
+
+    /* ── Steps ──────────────────────────────────────────────── */
+    .tracking-steps {
+      padding: 1.4rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      opacity: .32;
+      transition: opacity .45s;
+    }
+    .step.done, .step.current { opacity: 1; }
+
+    .step-bubble {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      transition: background .45s, box-shadow .45s;
+    }
+    .step.done .step-bubble {
+      background: linear-gradient(135deg, var(--teal), var(--green));
+    }
+    .step.current .step-bubble {
+      background: linear-gradient(135deg, var(--pink), var(--mango));
+      box-shadow: 0 0 0 6px rgba(244,165,43,.18);
+      animation: pulso 2s ease infinite;
+    }
+    @keyframes pulso {
+      0%,100% { box-shadow: 0 0 0 5px rgba(244,165,43,.15); }
+      50%      { box-shadow: 0 0 0 12px rgba(244,165,43,.04); }
+    }
+
+    .step-info { display: flex; flex-direction: column; }
+    .step-titulo {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      line-height: 1.2;
+    }
+    .step-desc {
+      font-size: .78rem;
+      color: var(--gray-600);
+      margin-top: .1rem;
+    }
+
+    .step-line {
+      width: 3px;
+      height: 26px;
+      margin-left: 22px;
+      border-radius: 2px;
+      background: var(--gray-200);
+      transition: background .45s;
+    }
+    .step-line.done {
+      background: linear-gradient(to bottom, var(--teal), var(--green));
+    }
+
+    /* ── Cancelado ──────────────────────────────────────────── */
+    .step.cancelado .step-bubble {
+      background: var(--coral);
+      opacity: 1;
+    }
+
+    /* ── Mensaje estado ─────────────────────────────────────── */
+    .status-msg {
+      margin: 0 1.6rem 1.6rem;
+      padding: .85rem 1.1rem;
+      border-radius: var(--radius-sm);
+      background: var(--mint);
+      border-left: 4px solid var(--teal);
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      transition: all .4s;
+    }
+    .status-msg.listo {
+      background: var(--mango-light);
+      border-left-color: var(--mango);
+    }
+    .status-msg.cancelado {
+      background: #FFE5E5;
+      border-left-color: var(--coral);
+      color: #842029;
+    }
+
+    /* ── Botón volver ───────────────────────────────────────── */
+    .btn-volver {
+      display: block;
+      text-align: center;
+      margin-top: 1.4rem;
+      padding: .85rem;
+      background: white;
+      border: 2px solid var(--teal);
+      color: var(--teal-dark);
+      border-radius: 50px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: .9rem;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-volver:hover {
+      background: var(--teal);
+      color: white;
+    }
+
+    /* ── Conectando ─────────────────────────────────────────── */
+    .conexion-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: inline-block;
+      margin-right: .35rem;
+      animation: dotBlink 1.2s ease infinite;
+    }
+    .conexion-dot.ok  { background: var(--green);  animation: none; }
+    .conexion-dot.off { background: var(--coral);  animation: none; }
+    @keyframes dotBlink {
+      0%,100% { opacity: .4; } 50% { opacity: 1; }
+    }
+    .conexion-label {
+      font-size: .75rem;
+      color: rgba(255,255,255,.75);
+      display: flex;
+      align-items: center;
+      margin-top: .5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Banner: ¡Tu pedido está listo! -->
+  <div id="bannerListo">
+    🎉 ¡Tu tapioca está lista y será llevada a ti! ¡Disfrútala! 🧋
+  </div>
+
+  <header class="header">
+    <div class="header-content">
+      <div class="header-logo">
+        <img src="img/Koru_logo.jpeg" alt="KORU"
+             onerror="this.style.display='none'" />
+        <span class="logo-text">KORU</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="tracking-main">
+
+    <div class="tracking-card">
+
+      <!-- Cabecera de la card -->
+      <div class="tracking-card-top">
+        <p class="saludo" id="saludoCliente">Hola 👋</p>
+        <h2>Tu pedido está en camino</h2>
+        <p class="tracking-numero" id="numeroPedidoDisplay">Cargando...</p>
+        <div class="conexion-label">
+          <span class="conexion-dot" id="conexionDot"></span>
+          <span id="conexionLabel">Conectando...</span>
+        </div>
+      </div>
+
+      <!-- Pasos del seguimiento -->
+      <div class="tracking-steps">
+
+        <div class="step" id="step-pendiente">
+          <div class="step-bubble">📱</div>
+          <div class="step-info">
+            <span class="step-titulo">Pedido Recibido</span>
+            <span class="step-desc">Tu pedido llegó a KORU</span>
+          </div>
+        </div>
+        <div class="step-line" id="line-0"></div>
+
+        <div class="step" id="step-confirmado">
+          <div class="step-bubble">✅</div>
+          <div class="step-info">
+            <span class="step-titulo">Confirmado</span>
+            <span class="step-desc">El equipo KORU aceptó tu pedido</span>
+          </div>
+        </div>
+        <div class="step-line" id="line-1"></div>
+
+        <div class="step" id="step-en_preparacion">
+          <div class="step-bubble">🧋</div>
+          <div class="step-info">
+            <span class="step-titulo">En Preparación</span>
+            <span class="step-desc">Estamos preparando tu tapioca</span>
+          </div>
+        </div>
+        <div class="step-line" id="line-2"></div>
+
+        <div class="step" id="step-listo">
+          <div class="step-bubble">🎉</div>
+          <div class="step-info">
+            <span class="step-titulo">¡Lista!</span>
+            <span class="step-desc">Tu tapioca está lista y será llevada a ti</span>
+          </div>
+        </div>
+        <div class="step-line" id="line-3"></div>
+
+        <div class="step" id="step-entregado">
+          <div class="step-bubble">📦</div>
+          <div class="step-info">
+            <span class="step-titulo">Entregado</span>
+            <span class="step-desc">¡Que la disfrutes! 💚</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mensaje del estado actual -->
+      <div class="status-msg" id="statusMsg">
+        ⏳ Esperando confirmación de KORU...
+      </div>
+
+    </div>
+
+    <a href="/" class="btn-volver">🛒 Hacer otro pedido</a>
+
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/tracking.js"></script>
+</body>
+</html>

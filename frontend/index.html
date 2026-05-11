@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KORU - Menú</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ── Splash Screen ───────────────────────────────────── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1A9D97 0%, #3DBDB7 50%, #82C341 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      gap: 1.2rem;
+      animation: splashFadeOut .6s ease 2.8s forwards;
+    }
+    #splash .splash-logo-box {
+      width: 155px;
+      height: 155px;
+      background: white;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.18);
+      animation: splashLogo .7s cubic-bezier(.34,1.56,.64,1) forwards;
+      opacity: 0;
+    }
+    #splash .splash-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 14px;
+    }
+    #splash h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: .04em;
+      animation: splashText .7s ease .4s forwards;
+      opacity: 0;
+    }
+    #splash p {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      color: rgba(255,255,255,.8);
+      animation: splashText .7s ease .65s forwards;
+      opacity: 0;
+    }
+    #splash .splash-dots {
+      display: flex; gap: .5rem; margin-top: .5rem;
+      animation: splashText .7s ease .9s forwards;
+      opacity: 0;
+    }
+    #splash .splash-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.6);
+      animation: dotPulse 1.2s ease infinite;
+    }
+    #splash .splash-dots span:nth-child(2) { animation-delay: .2s; }
+    #splash .splash-dots span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes splashLogo {
+      from { opacity:0; transform: scale(.6) translateY(20px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+    @keyframes splashText {
+      from { opacity:0; transform: translateY(15px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    @keyframes splashFadeOut {
+      from { opacity:1; pointer-events:all; }
+      to   { opacity:0; pointer-events:none; }
+    }
+    @keyframes dotPulse {
+      0%,100% { transform: scale(1); opacity:.5; }
+      50%      { transform: scale(1.4); opacity:1; }
+    }
+
+    #main-content { animation: contentFadeIn .5s ease 3.2s both; }
+    @keyframes contentFadeIn {
+      from { opacity:0; transform: translateY(10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Splash de bienvenida -->
+  <div id="splash">
+    <div class="splash-logo-box">
+      <img src="img/Koru_logo.jpeg" alt="KORU"
+           onerror="this.parentElement.innerHTML='<span style=\'font-size:2.8rem;font-weight:800;color:#3DBDB7;letter-spacing:.06em\'>KORU</span>'" />
+    </div>
+    <h1>Bienvenido a KORU</h1>
+    <p>Descubre nuestro menú y haz tu pedido</p>
+    <div class="splash-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div id="main-content">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-logo">
+          <img src="img/Koru_logo.jpeg" alt="KORU" onerror="this.style.display='none'" />
+          <span class="logo-text">KORU</span>
+        </div>
+        <button class="btn-carrito" id="btnCarrito" onclick="abrirCarrito()">
+          🧋 <span class="badge" id="badgeCarrito">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Categorías -->
+    <nav class="categorias-nav" id="categoriasNav">
+      <button class="cat-btn active" data-id="" onclick="filtrarCategoria('', this)">Todos</button>
+    </nav>
+
+    <!-- Productos -->
+    <main class="main-content">
+      <div class="koru-tagline">
+        <h2>🧋 Tapiocas Estilo Sago Tailandés</h2>
+        <p>Frescas, cremosas y naturales · Perlas suaves y deliciosas · ¡Un toque dulce que te hará volver por más!</p>
+      </div>
+      <div class="productos-grid" id="productosGrid">
+        <div class="loading">Cargando menú...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Panel carrito -->
+  <div class="overlay" id="overlay" onclick="cerrarCarrito()"></div>
+  <aside class="carrito-panel" id="carritoPanel">
+    <div class="carrito-header">
+      <h2>🧋 Tu Pedido</h2>
+      <button onclick="cerrarCarrito()" class="btn-cerrar">✕</button>
+    </div>
+    <div class="carrito-body">
+      <div class="cliente-form">
+        <h3>Tus datos</h3>
+        <input type="text" id="clienteNombre" placeholder="Tu nombre *" required />
+        <input type="tel" id="clienteTelefono" placeholder="WhatsApp (ej: +521XXXXXXXXXX) *" required />
+        <input type="text" id="clienteDireccion" placeholder="📍 ¿A dónde llevamos tu pedido? *" required />
+        <textarea id="clienteNotas" placeholder="Notas especiales (ej: sin azúcar, leche de soya...)" rows="2"></textarea>
+
+        <h3 style="margin-top:.4rem">¿Cómo vas a pagar?</h3>
+        <div class="metodo-pago-selector">
+          <button type="button" class="metodo-btn active" onclick="seleccionarMetodo(this,'efectivo')">
+            💵<br>Efectivo
+          </button>
+          <button type="button" class="metodo-btn" onclick="seleccionarMetodo(this,'transferencia')">
+            📱<br>Transferencia
+          </button>
+        </div>
+
+        <!-- Datos bancarios + subir comprobante (solo visible si elige transferencia) -->
+        <div id="transferenciaBox" class="transferencia-box hidden">
+          <div class="cuenta-datos">
+            <p class="cuenta-titulo">📋 Datos para transferir</p>
+            <!-- ✏️ Cambia estos datos por los de tu cuenta -->
+            <div class="cuenta-fila"><span>Banco</span><strong>BBVA</strong></div>
+            <div class="cuenta-fila"><span>Titular</span><strong>KORU Tapiocas</strong></div>
+            <div class="cuenta-fila"><span>CLABE</span><strong>012 345 678 901 234 5</strong></div>
+            <div class="cuenta-fila"><span>Concepto</span><strong>Tapioca KORU</strong></div>
+          </div>
+          <label class="upload-label" id="uploadLabel" for="comprobanteFile">
+            <span id="uploadIcono">📎</span>
+            <span id="uploadTexto">Toca aquí para subir tu comprobante *</span>
+            <input type="file" id="comprobanteFile" accept="image/*,.pdf"
+                   onchange="previsualizarComprobante(this)" />
+          </label>
+          <img id="comprobantePreview" class="comprobante-preview-img hidden" alt="Vista previa" />
+        </div>
+      </div>
+      <div class="carrito-items" id="carritoItems">
+        <p class="carrito-vacio">Tu carrito está vacío</p>
+      </div>
+    </div>
+    <div class="carrito-footer">
+      <div class="total-row">
+        <span>Total:</span>
+        <span class="total-precio" id="totalPrecio">$0.00</span>
+      </div>
+      <p id="avisoComprobante" class="aviso-comprobante hidden">
+        📎 Sube el comprobante de transferencia para continuar
+      </p>
+      <button class="btn-pedido" id="btnPedido" onclick="enviarPedido()">Enviar Pedido</button>
+    </div>
+  </aside>
+
+  <script src="js/toast.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

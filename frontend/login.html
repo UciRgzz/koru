@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KORU - Iniciar Sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #EEF2F7;
+    }
+
+    /* ── Contenedor split ─────────────────────────────────── */
+    .login-split {
+      display: flex;
+      width: 960px;
+      max-width: 98vw;
+      min-height: 580px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,.18);
+      animation: fadeUp .4s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(28px); } to { opacity:1; transform: translateY(0); } }
+
+    /* ── Panel izquierdo ──────────────────────────────────── */
+    .login-left {
+      flex: 1.1;
+      background: linear-gradient(155deg, #0A3D44 0%, #0E6B6B 40%, #1A9D97 75%, #3DBD7A 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 3rem 2.5rem;
+    }
+
+    /* Burbujas decorativas */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+    .b1 { width: 280px; height: 280px; top: -80px; left: -80px; }
+    .b2 { width: 180px; height: 180px; bottom: -50px; right: -50px; background: rgba(255,255,255,.05); }
+    .b3 { width: 120px; height: 120px; top: 55%; right: 12%; background: rgba(255,255,255,.06); }
+    .b4 { width: 70px;  height: 70px;  top: 20%;  left: 15%;  background: rgba(255,255,255,.08); }
+    .b5 { width: 200px; height: 200px; bottom: 10%; left: -60px; background: rgba(61,189,183,.12); }
+
+    .left-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: white;
+    }
+
+    .left-icon {
+      font-size: 4.2rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.25));
+      animation: float 3.5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+
+    .left-content h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-shadow: 0 2px 16px rgba(0,0,0,.2);
+      margin-bottom: .35rem;
+    }
+    .left-content .left-sub {
+      font-size: .92rem;
+      color: rgba(255,255,255,.75);
+      font-weight: 400;
+      margin-bottom: 2.2rem;
+      letter-spacing: .03em;
+    }
+
+    .left-features {
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+    }
+    .feature-pill {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 50px;
+      padding: .6rem 1.3rem;
+      font-size: .84rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      transition: background .2s;
+    }
+    .feature-pill:hover { background: rgba(255,255,255,.2); }
+    .feature-pill .pill-icon { font-size: 1.1rem; }
+
+    /* ── Panel derecho ────────────────────────────────────── */
+    .login-right {
+      flex: 1;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2.8rem;
+    }
+
+    .login-form-box {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .login-logo {
+      margin-bottom: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .login-logo img {
+      height: 60px;
+      border-radius: 14px;
+      object-fit: contain;
+      box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    }
+    .login-logo .brand-name {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0E6B6B, #1A9D97);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: .06em;
+    }
+
+    .form-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1A202C;
+      margin-bottom: .3rem;
+      text-align: center;
+    }
+    .form-subtitle {
+      font-size: .84rem;
+      color: #94A3B8;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    /* Divisor decorativo */
+    .title-line {
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, #1A9D97, #3DBD7A);
+      border-radius: 2px;
+      margin: .4rem auto 1.8rem;
+    }
+
+    /* Inputs */
+    .input-wrap {
+      position: relative;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: #94A3B8;
+      pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: .8rem 1rem .8rem 2.8rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      font-size: .93rem;
+      font-family: 'Poppins', sans-serif;
+      color: #1A202C;
+      background: #F8FAFC;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .input-wrap input:focus {
+      border-color: #1A9D97;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(26,157,151,.13);
+    }
+    .input-wrap input::placeholder { color: #CBD5E0; }
+
+    /* Botón */
+    .btn-login {
+      width: 100%;
+      padding: .9rem;
+      background: linear-gradient(135deg, #0E6B6B 0%, #1A9D97 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: .96rem;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      margin-top: .4rem;
+      transition: all .2s;
+      box-shadow: 0 4px 18px rgba(26,157,151,.35);
+      letter-spacing: .02em;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(26,157,151,.45); }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled { background: #CBD5E0; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Error */
+    .error-msg {
+      color: #E53E3E;
+      font-size: .81rem;
+      text-align: center;
+      margin-top: .8rem;
+      min-height: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* Link catálogo */
+    .link-catalogo {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: 1.8rem;
+      color: #1A9D97;
+      font-size: .83rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .link-catalogo:hover { color: #0E6B6B; }
+
+    .footer-copy {
+      margin-top: 2rem;
+      font-size: .72rem;
+      color: #CBD5E0;
+      text-align: center;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 720px) {
+      .login-split { flex-direction: column; border-radius: 0; min-height: 100vh; width: 100%; }
+      .login-left { padding: 2.5rem 2rem 2rem; flex: none; min-height: 260px; }
+      .left-features { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .left-content h1 { font-size: 2.2rem; }
+      .left-icon { font-size: 3rem; margin-bottom: .7rem; }
+      .login-right { padding: 2.5rem 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-split">
+
+    <!-- ── Panel izquierdo ── -->
+    <div class="login-left">
+      <div class="bubble b1"></div>
+      <div class="bubble b2"></div>
+      <div class="bubble b3"></div>
+      <div class="bubble b4"></div>
+      <div class="bubble b5"></div>
+
+      <div class="left-content">
+        <div class="left-icon">🧋</div>
+        <h1>KORU</h1>
+        <p class="left-sub">Sistema de Gestión de Pedidos</p>
+
+        <div class="left-features">
+          <div class="feature-pill"><span class="pill-icon">📋</span> Pedidos en tiempo real</div>
+          <div class="feature-pill"><span class="pill-icon">🧋</span> Gestión del menú</div>
+          <div class="feature-pill"><span class="pill-icon">📊</span> Tablero Kanban</div>
+          <div class="feature-pill"><span class="pill-icon">🧾</span> Comprobantes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel derecho ── -->
+    <div class="login-right">
+      <div class="login-form-box">
+
+        <div class="login-logo">
+          <img src="img/Koru_logo.jpeg" alt="KORU"
+               onerror="this.style.display='none'" />
+          <span class="brand-name">KORU</span>
+        </div>
+
+        <h2 class="form-title">Iniciar Sesión</h2>
+        <div class="title-line"></div>
+        <p class="form-subtitle">Ingresa al panel de administración</p>
+
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="email" placeholder="Correo electrónico"
+                 autocomplete="username" />
+        </div>
+
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="password" placeholder="Contraseña"
+                 autocomplete="current-password"
+                 onkeydown="if(event.key==='Enter') iniciarSesion()" />
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="iniciarSesion()">
+          Ingresar al Sistema
+        </button>
+        <p class="error-msg" id="errorMsg"></p>
+
+        <a href="/" class="link-catalogo">← Ver catálogo de productos</a>
+
+        <p class="footer-copy">© 2025 KORU · Sistema de Gestión</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const token   = localStorage.getItem('token');
+    const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+    if (token && usuario) { window.location.href = '/admin'; }
+
+    async function iniciarSesion() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('btnLogin');
+      const errorMsg = document.getElementById('errorMsg');
+
+      errorMsg.textContent = '';
+      if (!email || !password) { errorMsg.textContent = 'Completa todos los campos'; return; }
+
+      btn.disabled = true; btn.textContent = 'Verificando...';
+      try {
+        const res  = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const json = await res.json();
+        if (!json.ok) { errorMsg.textContent = json.mensaje; return; }
+        localStorage.setItem('token', json.token);
+        localStorage.setItem('usuario', JSON.stringify(json.usuario));
+        window.location.href = '/admin';
+      } catch {
+        errorMsg.textContent = 'Error de conexión. Intenta de nuevo.';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Ingresar al Sistema';
+      }
+    }
+  </script>
+</body>
+</html>
