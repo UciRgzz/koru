@@ -70,7 +70,7 @@ if (numeroPedido) {
   fetch(`/api/pedidos/status/${encodeURIComponent(numeroPedido)}`)
     .then(r => r.json())
     .then(json => {
-      if (json.ok) actualizarTracking(json.data.estado);
+      if (json.ok) actualizarTracking(json.data.estado, json.data.tiempo_estimado);
     })
     .catch(() => {});
 
@@ -92,19 +92,19 @@ socket.on('disconnect', () => {
 
 socket.on('estado_pedido', (pedido) => {
   if (pedido.numero_pedido !== numeroPedido) return;
-  actualizarTracking(pedido.estado);
+  actualizarTracking(pedido.estado, pedido.tiempo_estimado);
   if (pedido.estado === 'listo') mostrarNotifListo();
 });
 
 // ── Actualizar pasos ──────────────────────────────────────────
-function actualizarTracking(estado) {
+function actualizarTracking(estado, tiempoEstimado) {
   const idx = ORDEN[estado] ?? -1;
 
   PASOS.forEach((s, i) => {
     const el = document.getElementById(`step-${s}`);
     if (!el) return;
     el.classList.remove('done', 'current');
-    if (i < idx)      el.classList.add('done');
+    if (i < idx)        el.classList.add('done');
     else if (i === idx) el.classList.add('current');
   });
 
@@ -114,14 +114,25 @@ function actualizarTracking(estado) {
     if (line) line.classList.toggle('done', i < idx);
   }
 
-  // Mensaje
+  // Descripción dinámica del paso "listo" con tiempo estimado
+  const descListo = document.getElementById('desc-listo');
+  if (descListo) {
+    descListo.textContent = tiempoEstimado
+      ? `En camino · llegará en aproximadamente ${tiempoEstimado} min 🛵`
+      : 'Tu tapioca está lista y será llevada a ti';
+  }
+
+  // Mensaje de estado
   const msgEl = document.getElementById('statusMsg');
-  msgEl.textContent = MENSAJES[estado] || '';
+  let mensaje = MENSAJES[estado] || '';
+  if (estado === 'listo' && tiempoEstimado) {
+    mensaje = `🛵 ¡Tu tapioca está lista y va en camino! Llegará en aproximadamente ${tiempoEstimado} minutos.`;
+  }
+  msgEl.textContent = mensaje;
   msgEl.className = 'status-msg';
   if (estado === 'listo')     msgEl.classList.add('listo');
   if (estado === 'cancelado') msgEl.classList.add('cancelado');
 
-  // Si está cancelado, marcar el step actual con estilo especial
   if (estado === 'cancelado') {
     PASOS.forEach(s => {
       const el = document.getElementById(`step-${s}`);

@@ -93,7 +93,7 @@
     }
   </style>
 </head>
-<body>
+<body class="menu-body">
 
   <!-- Splash de bienvenida -->
   <div id="splash">
@@ -122,6 +122,15 @@
       </div>
     </header>
 
+    <!-- Horario y zona -->
+    <div class="horario-bar">
+      <span>🕐 7:30 AM – 10:00 PM</span>
+      <span class="horario-sep">·</span>
+      <span>🛵 Entrega gratis</span>
+      <span class="horario-sep">·</span>
+      <span>📍 Universidad de Montemorelos y alrededores</span>
+    </div>
+
     <!-- Categorías -->
     <nav class="categorias-nav" id="categoriasNav">
       <button class="cat-btn active" data-id="" onclick="filtrarCategoria('', this)">Todos</button>
@@ -130,8 +139,16 @@
     <!-- Productos -->
     <main class="main-content">
       <div class="koru-tagline">
-        <h2>🧋 Tapiocas Estilo Sago Tailandés</h2>
-        <p>Frescas, cremosas y naturales · Perlas suaves y deliciosas · ¡Un toque dulce que te hará volver por más!</p>
+        <div class="tagline-deco tagline-deco-1">🧋</div>
+        <div class="tagline-deco tagline-deco-2">🫧</div>
+        <div class="tagline-badge">Estilo Sago Tailandés</div>
+        <h2>Tapiocas Artesanales<br><span>con Sabor a Paraíso</span></h2>
+        <p>Perlas suaves · Ingredientes frescos · Cremosas y naturales</p>
+        <div class="tagline-pills">
+          <span>🍓 Fresa</span>
+          <span>🥭 Mango</span>
+          <span>🥥 Piña Colada</span>
+        </div>
       </div>
       <div class="productos-grid" id="productosGrid">
         <div class="loading">Cargando menú...</div>
@@ -151,8 +168,19 @@
         <h3>Tus datos</h3>
         <input type="text" id="clienteNombre" placeholder="Tu nombre *" required />
         <input type="tel" id="clienteTelefono" placeholder="WhatsApp (ej: +521XXXXXXXXXX) *" required />
-        <input type="text" id="clienteDireccion" placeholder="📍 ¿A dónde llevamos tu pedido? *" required />
-        <textarea id="clienteNotas" placeholder="Notas especiales (ej: sin azúcar, leche de soya...)" rows="2"></textarea>
+        <input type="text" id="clienteDireccion" placeholder="📍 Dirección de entrega (ej: Residencia A, piso 2) *" required />
+        <p class="zona-entrega-nota">🛵 Entrega gratis · Universidad de Montemorelos y alrededores</p>
+        <textarea id="clienteNotas" placeholder="Notas especiales (ej: sin azúcar, tamaño extra...)" rows="2"></textarea>
+
+        <h3 style="margin-top:.6rem">🥛 ¿Qué tipo de leche?</h3>
+        <div class="metodo-pago-selector">
+          <button type="button" class="leche-btn active" onclick="seleccionarLeche(this,'carnation')">
+            🥛<br>Leche Carnation
+          </button>
+          <button type="button" class="leche-btn" onclick="seleccionarLeche(this,'condensada')">
+            🥛<br>Leche Condensada
+          </button>
+        </div>
 
         <h3 style="margin-top:.4rem">¿Cómo vas a pagar?</h3>
         <div class="metodo-pago-selector">

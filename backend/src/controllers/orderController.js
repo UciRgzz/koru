@@ -13,7 +13,7 @@ async function crearPedido(req, res) {
   const conn = await db.connect();
   try {
     await conn.query('BEGIN');
-    const { nombre, telefono, notas, metodo_pago, direccion } = req.body;
+    const { nombre, telefono, notas, metodo_pago, direccion, tipo_leche } = req.body;
     // items llega como JSON string cuando se envía con FormData
     const items = typeof req.body.items === 'string'
       ? JSON.parse(req.body.items)
@@ -75,8 +75,8 @@ async function crearPedido(req, res) {
     const metodoPagoFinal = metodosValidos.includes(metodo_pago) ? metodo_pago : 'efectivo';
 
     const { rows: pedidoRows } = await conn.query(
-      'INSERT INTO pedidos (numero_pedido, cliente_id, notas, total, metodo_pago, comprobante_url, direccion) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id',
-      [numeroPedido, clienteId, notas || null, total, metodoPagoFinal, comprobanteUrl, direccion || null]
+      'INSERT INTO pedidos (numero_pedido, cliente_id, notas, total, metodo_pago, comprobante_url, direccion, tipo_leche) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',
+      [numeroPedido, clienteId, notas || null, total, metodoPagoFinal, comprobanteUrl, direccion || null, tipo_leche || null]
     );
     const pedidoId = pedidoRows[0].id;
 
@@ -136,15 +136,23 @@ async function getPedido(req, res) {
 
 async function actualizarEstado(req, res) {
   try {
-    const { estado } = req.body;
+    const { estado, tiempo_estimado } = req.body;
     const estadosValidos = ['pendiente', 'confirmado', 'en_preparacion', 'listo', 'entregado', 'cancelado'];
     if (!estadosValidos.includes(estado)) {
       return res.status(400).json({ ok: false, mensaje: 'Estado no válido' });
     }
 
-    const { rowCount } = await db.query(
-      'UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, req.params.id]
-    );
+    let rowCount;
+    if (tiempo_estimado) {
+      ({ rowCount } = await db.query(
+        'UPDATE pedidos SET estado = $1, tiempo_estimado = $2 WHERE id = $3',
+        [estado, tiempo_estimado, req.params.id]
+      ));
+    } else {
+      ({ rowCount } = await db.query(
+        'UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, req.params.id]
+      ));
+    }
     if (!rowCount) return res.status(404).json({ ok: false, mensaje: 'Pedido no encontrado' });
 
     const pedidoActualizado = await getPedidoCompleto(req.params.id);
@@ -166,7 +174,7 @@ async function actualizarEstado(req, res) {
 async function getEstadoPedido(req, res) {
   try {
     const { rows } = await db.query(
-      `SELECT p.numero_pedido, p.estado, c.nombre AS cliente_nombre
+      `SELECT p.numero_pedido, p.estado, p.tiempo_estimado, c.nombre AS cliente_nombre
        FROM pedidos p JOIN clientes c ON p.cliente_id = c.id
        WHERE p.numero_pedido = $1`,
       [req.params.numero]

@@ -54,7 +54,7 @@ function mostrarTab(nombre, btn) {
 
 // ── TABLERO EN TIEMPO REAL ────────────────────────────────────
 async function iniciarTablero() {
-  const hoy = new Date().toISOString().split('T')[0];
+  const hoy = fechaLocalHoy();
   const res = await fetch(`/api/pedidos?fecha=${hoy}`, { headers: authHeader() });
   if (res.status === 401) { cerrarSesion(); return; }
   const { data } = await res.json();
@@ -74,7 +74,6 @@ function renderTablero() {
     { col: 'colPendiente',   count: 'countPendiente',   estados: ['pendiente', 'confirmado'] },
     { col: 'colPreparacion', count: 'countPreparacion',  estados: ['en_preparacion'] },
     { col: 'colListo',       count: 'countListo',        estados: ['listo'] },
-    { col: 'colEntregado',   count: 'countEntregado',    estados: ['entregado'] },
   ];
 
   for (const { col, count, estados } of columnas) {
@@ -122,6 +121,7 @@ function renderCardTablero(p) {
         <span class="tiempo-transcurrido">⏱ ${min} min</span>
       </div>
       <div class="cocina-mesa">👤 ${p.cliente_nombre} · ${iconoPago(p.metodo_pago)}</div>
+      ${p.tipo_leche ? `<div class="cocina-mesa" style="color:#7C3AED;font-weight:700">🥛 ${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</div>` : ''}
       ${p.direccion ? `<div class="cocina-mesa" style="color:#2980b9;font-weight:600">📍 ${p.direccion}</div>` : ''}
       ${p.notas ? `<div class="cocina-mesa" style="color:#f39c12">📝 ${p.notas}</div>` : ''}
       ${p.comprobante_url ? `<div class="comp-badge" onclick="verComprobante('${p.comprobante_url}')">🧾 Ver comprobante</div>` : ''}
@@ -143,6 +143,15 @@ function botonesTablero(p) {
     <button class="btn-cancelar" onclick="cambiarEstadoTablero(${id},'cancelado')">✕ Cancelar</button>
   `;
   if (estado === 'en_preparacion') return `
+    <div class="tiempo-selector">
+      <span class="tiempo-label">⏱ Tiempo estimado de entrega:</span>
+      <div class="tiempo-pills">
+        ${[10,15,20,25,30,35,40].map(m =>
+          `<button class="pill-tiempo" onclick="selTiempo(${id},${m},this)">${m}</button>`
+        ).join('')}
+        <span class="tiempo-min-label">min</span>
+      </div>
+    </div>
     <button class="btn-listo" onclick="cambiarEstadoTablero(${id},'listo')">✅ Listo</button>
   `;
   if (estado === 'listo') return `
@@ -150,16 +159,21 @@ function botonesTablero(p) {
   `;
   if (estado === 'entregado') return `
     <span style="color:#718096;font-size:.76rem;font-weight:600">✅ Completado</span>
-    <button class="btn-wp-comp" onclick="generarComprobanteImagen(pedidos[${id}])">📱 Comprobante</button>
+    ${p.metodo_pago === 'efectivo' ? `<button class="btn-wp-comp" onclick="generarComprobanteImagen(pedidos[${id}])">📱 Comprobante</button>` : ''}
   `;
   return '';
 }
 
 async function cambiarEstadoTablero(id, estado) {
+  const body = { estado };
+  if (estado === 'listo' && _tiempoEstimado[id]) {
+    body.tiempo_estimado = _tiempoEstimado[id];
+    delete _tiempoEstimado[id];
+  }
   const res = await fetch(`/api/pedidos/${id}/estado`, {
     method: 'PATCH',
     headers: authHeader(),
-    body: JSON.stringify({ estado }),
+    body: JSON.stringify(body),
   });
   if (res.ok) {
     const { data } = await res.json();
@@ -197,7 +211,7 @@ async function cargarPedidos() {
         <td>${hora}</td>
         <td style="display:flex;gap:.3rem;flex-wrap:wrap">
           <button class="btn-accion btn-ver" onclick="verDetalle(${p.id})">👁 Ver</button>
-          ${p.estado === 'entregado' ? `<button class="btn-accion btn-wp-comp" onclick="generarComprobanteDesdeId(${p.id})">📱 Comprobante</button>` : ''}
+          ${p.estado === 'entregado' && p.metodo_pago === 'efectivo' ? `<button class="btn-accion btn-wp-comp" onclick="generarComprobanteDesdeId(${p.id})">📱 Comprobante</button>` : ''}
         </td>
       </tr>
     `;
@@ -217,13 +231,17 @@ function verComprobante(url) {
 }
 
 // ── Detalle de pedido ─────────────────────────────────────────
+let _pedidoDetalle = null;
+
 async function verDetalle(id) {
   const res = await fetch(`/api/pedidos/${id}`, { headers: authHeader() });
   const { data: p } = await res.json();
+  _pedidoDetalle = p;
 
   document.getElementById('modalTitulo').textContent = `Pedido #${p.numero_pedido}`;
   document.getElementById('modalCuerpo').innerHTML = `
     <p><strong>Cliente:</strong> ${p.cliente_nombre} | ${p.cliente_telefono}</p>
+    ${p.tipo_leche ? `<p style="color:#7C3AED;font-weight:600"><strong>🥛 Leche:</strong> ${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</p>` : ''}
     ${p.direccion ? `<p style="color:#2471a3"><strong>📍 Dirección:</strong> ${p.direccion}</p>` : ''}
     <p><strong>Método de pago:</strong> ${iconoPago(p.metodo_pago)}</p>
     ${p.notas ? `<p><strong>Notas:</strong> ${p.notas}</p>` : ''}
@@ -248,9 +266,16 @@ async function verDetalle(id) {
 
   const colores = { confirmado:'#2980b9', en_preparacion:'#c0392b', listo:'#27ae60', entregado:'#888', cancelado:'#e74c3c' };
   const siguientes = { pendiente:['confirmado','cancelado'], confirmado:['en_preparacion','cancelado'], en_preparacion:['listo','cancelado'], listo:['entregado'] }[p.estado] || [];
-  document.getElementById('estadoAcciones').innerHTML = siguientes.map(s =>
+
+  const botonesEstado = siguientes.map(s =>
     `<button style="background:${colores[s]};color:white" onclick="cambiarEstadoDesdeModal(${p.id},'${s}')">${etiquetaEstado(s)}</button>`
   ).join('');
+
+  const btnComp = (p.estado === 'entregado' || p.estado === 'listo') && p.metodo_pago === 'efectivo'
+    ? `<button style="background:#25D366;color:white;border:none;padding:.48rem 1rem;border-radius:50px;cursor:pointer;font-weight:600;font-size:.83rem;font-family:Poppins,sans-serif;box-shadow:0 3px 10px rgba(37,211,102,.35)" onclick="cerrarModalDetalle();generarComprobanteImagen(_pedidoDetalle)">📱 Comprobante</button>`
+    : '';
+
+  document.getElementById('estadoAcciones').innerHTML = botonesEstado + btnComp;
 
   document.getElementById('modalDetalle').classList.add('visible');
 }
@@ -316,6 +341,15 @@ async function cargarComprobantes() {
   }).join('');
 }
 
+// ── Tiempo estimado de entrega ────────────────────────────────
+const _tiempoEstimado = {};
+
+function selTiempo(id, min, btn) {
+  _tiempoEstimado[id] = min;
+  btn.closest('.tiempo-pills').querySelectorAll('.pill-tiempo').forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+}
+
 // ── Comprobante imagen ────────────────────────────────────────
 let _compBlob = null;
 let _compTel  = '';
@@ -331,6 +365,7 @@ async function generarComprobanteImagen(p) {
     `<div class="recibo-fila"><span>Teléfono</span><span>${p.cliente_telefono}</span></div>`,
     p.direccion ? `<div class="recibo-fila"><span>Dirección</span><span>${p.direccion}</span></div>` : '',
     `<div class="recibo-fila"><span>Pago</span><span>${p.metodo_pago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}</span></div>`,
+    p.tipo_leche ? `<div class="recibo-fila"><span>Leche</span><span>${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</span></div>` : '',
   ].join('');
 
   document.getElementById('reciboItems').innerHTML = (p.items || []).map(i =>
@@ -432,7 +467,12 @@ setInterval(actualizarReloj, 1000);
 setInterval(renderTablero, 30000);
 actualizarReloj();
 
-document.getElementById('filtroPedidoFecha').value = new Date().toISOString().split('T')[0];
-document.getElementById('filtroCompFecha').value = new Date().toISOString().split('T')[0];
+function fechaLocalHoy() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+document.getElementById('filtroPedidoFecha').value = fechaLocalHoy();
+document.getElementById('filtroCompFecha').value   = fechaLocalHoy();
 
 iniciarTablero();

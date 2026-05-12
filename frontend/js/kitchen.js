@@ -90,6 +90,7 @@ function renderCard(pedido) {
         <span class="tiempo-transcurrido">⏱ ${tiempoMin} min</span>
       </div>
       <div class="cocina-mesa">👤 ${pedido.cliente_nombre}${pedido.mesa ? ` · Mesa ${pedido.mesa}` : ''}</div>
+      ${pedido.tipo_leche ? `<div class="cocina-mesa" style="color:#7C3AED;font-weight:700">🥛 ${pedido.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</div>` : ''}
       ${pedido.notas ? `<div class="cocina-mesa" style="color:#f39c12">📝 ${pedido.notas}</div>` : ''}
       <div style="margin:.6rem 0">${items}</div>
       <div class="cocina-actions">${acciones}</div>
