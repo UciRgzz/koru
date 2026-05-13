@@ -8,30 +8,32 @@ async function activarNotificaciones() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
   try {
-    // Registrar Service Worker
+    // Registrar SW y esperar a que esté activo
     const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready; // ← espera a que esté realmente activo
 
-    // Pedir permiso al usuario
     const permiso = await Notification.requestPermission();
     if (permiso !== 'granted') return;
 
-    // Obtener clave pública VAPID del servidor
-    const { publicKey } = await fetch('/api/push/vapid-public-key').then(r => r.json());
+    // Verificar si ya hay suscripción activa
+    let suscripcion = await reg.pushManager.getSubscription();
 
-    // Suscribirse al push
-    const suscripcion = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    });
+    if (!suscripcion) {
+      const { publicKey } = await fetch('/api/push/vapid-public-key').then(r => r.json());
+      suscripcion = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+    }
 
-    // Enviar suscripción al backend junto con el número de pedido
+    // Guardar en backend
     await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: suscripcion, numeroPedido }),
     });
 
-    console.log('✅ Notificaciones push activadas');
+    console.log('✅ Push activado');
   } catch (err) {
     console.warn('Push no disponible:', err.message);
   }

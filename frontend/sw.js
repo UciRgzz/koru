@@ -1,38 +1,58 @@
-// Service Worker – KORU notificaciones push
-const CACHE = 'koru-v1';
+const CACHE_NAME = 'koru-v2';
+const STATIC = ['/img/Koru_logo.jpeg'];
 
-// Muestra la notificación cuando llega un push del servidor
-self.addEventListener('push', event => {
-  if (!event.data) return;
-  const { titulo, cuerpo, url } = event.data.json();
+// Instalar y activar inmediatamente
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(STATIC))
+  );
+  self.skipWaiting(); // ← crítico: activa el SW sin esperar
+});
 
-  event.waitUntil(
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim(); // ← crítico: toma control inmediato de todas las pestañas
+});
+
+// Fetch: pass-through (necesario para que Chrome mantenga el SW vivo)
+self.addEventListener('fetch', e => {
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+});
+
+// Mostrar notificación push
+self.addEventListener('push', e => {
+  if (!e.data) return;
+  const { titulo, cuerpo, url } = e.data.json();
+
+  e.waitUntil(
     self.registration.showNotification(titulo, {
-      body:    cuerpo,
-      icon:    '/img/Koru_logo.jpeg',
-      badge:   '/img/Koru_logo.jpeg',
-      vibrate: [300, 100, 300, 100, 600],
-      tag:     'koru-pedido',          // reemplaza la notif anterior del mismo pedido
+      body:     cuerpo,
+      icon:     '/img/Koru_logo.jpeg',
+      badge:    '/img/Koru_logo.jpeg',
+      vibrate:  [300, 100, 300, 100, 600],
+      tag:      'koru-pedido',
       renotify: true,
-      data:    { url },
-      actions: [{ action: 'ver', title: '👁 Ver mi pedido' }],
+      data:     { url },
+      actions:  [{ action: 'ver', title: '👁 Ver mi pedido' }],
     })
   );
 });
 
-// Al tocar la notificación, abre o enfoca la página de seguimiento
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const url = event.notification.data?.url || '/';
+// Al tocar la notificación → abrir la URL correcta
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = e.notification.data?.url || '/';
 
-  event.waitUntil(
-    clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then(lista => {
-        for (const client of lista) {
-          if ('focus' in client) { client.focus(); return; }
-        }
-        return clients.openWindow(url);
-      })
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(lista => {
+      // Buscar pestaña con esa URL exacta
+      const match = lista.find(c => c.url.includes(url));
+      if (match) return match.focus();
+      return clients.openWindow(url); // Si no existe, abrir nueva
+    })
   );
 });
