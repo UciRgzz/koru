@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administración</title>
+  <link rel="icon" type="image/jpeg" href="/img/Koru_logo.jpeg" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body class="admin-body">
@@ -83,7 +84,7 @@
             <option value="entregado">Entregados</option>
             <option value="cancelado">Cancelados</option>
           </select>
-          <button class="btn-primary" onclick="cargarPedidos()">🔄 Actualizar</button>
+          <button class="btn-primary" onclick="cargarPedidos()">Actualizar</button>
         </div>
       </div>
       <div class="tabla-container">
@@ -112,7 +113,7 @@
         <h2>🧾 Comprobantes de Transferencia</h2>
         <div class="filtros">
           <input type="date" id="filtroCompFecha" onchange="cargarComprobantes()" />
-          <button class="btn-primary" onclick="cargarComprobantes()">🔄 Actualizar</button>
+          <button class="btn-primary" onclick="cargarComprobantes()">Actualizar</button>
         </div>
       </div>
       <div class="resumen-dia" id="resumenDia"></div>
