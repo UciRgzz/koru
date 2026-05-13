@@ -107,15 +107,24 @@ function usarUbicacion() {
         const calleNum = calle ? (numero ? `${calle} ${numero}` : calle) : '';
         const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || '';
         const ciudad   = a.city || a.town || a.village || a.municipality || '';
-        const partes   = [calleNum, colonia, ciudad].filter(Boolean);
+        const estadoAbrev = {
+          'Nuevo León':'NL','Jalisco':'JAL','Ciudad de México':'CDMX',
+          'Coahuila de Zaragoza':'COAH','Tamaulipas':'TAMS','Veracruz de Ignacio de la Llave':'VER',
+          'Sonora':'SON','Chihuahua':'CHIH','Baja California':'BC','Sinaloa':'SIN',
+          'Oaxaca':'OAX','Guerrero':'GRO','Michoacán de Ocampo':'MICH','Puebla':'PUE',
+        }[a.state] || (a.state ? a.state.substring(0,3).toUpperCase() : '');
+        const ciudadNL = ciudad ? `${ciudad}${estadoAbrev ? ' '+estadoAbrev : ''}` : '';
+        const partes   = [calleNum, colonia, ciudadNL].filter(Boolean);
 
         let dir;
         if (partes.length >= 2) {
           dir = partes.join(', ');
         } else {
-          // Nominatim siempre devuelve display_name completo; tomar las primeras 3 partes
-          const dp = (data.display_name || '').split(',').map(s => s.trim()).filter(Boolean);
-          dir = dp.slice(0, 3).join(', ') || data.display_name;
+          // Filtrar partes numéricas (CP) y el nombre del estado largo
+          const dp = (data.display_name || '').split(',')
+            .map(s => s.trim())
+            .filter(s => s && !/^\d+$/.test(s) && s !== a.state && s !== a.postcode);
+          dir = dp.slice(0, 3).join(', ') || ciudadNL || data.display_name;
         }
 
         document.getElementById('clienteDireccion').value = dir;
