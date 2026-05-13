@@ -120,8 +120,11 @@ function renderCardTablero(p) {
         <h3 style="cursor:pointer;text-decoration:underline" onclick="verDetalle(${p.id})">#${p.numero_pedido}</h3>
         <span class="tiempo-transcurrido">⏱ ${min} min</span>
       </div>
-      <div class="cocina-mesa">👤 ${p.cliente_nombre} · ${iconoPago(p.metodo_pago)}</div>
-      ${p.tipo_leche ? `<div class="cocina-mesa" style="color:#7C3AED;font-weight:700">🥛 ${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</div>` : ''}
+      <div class="cocina-mesa">
+        👤 ${p.cliente_nombre} · ${iconoPago(p.metodo_pago)}
+        ${p.cliente_telefono ? `<a href="tel:${p.cliente_telefono}" class="btn-llamar" title="Llamar cliente">📞</a>` : ''}
+      </div>
+      ${p.tipo_leche && p.tipo_leche !== 'clasica' ? `<div class="cocina-mesa" style="color:#7C3AED;font-weight:700">🥛 Leche de ${p.tipo_leche.charAt(0).toUpperCase()+p.tipo_leche.slice(1)} (+$5)</div>` : ''}
       ${p.direccion ? `<div class="cocina-mesa" style="color:#2980b9;font-weight:600">📍 ${p.direccion}</div>` : ''}
       ${p.notas ? `<div class="cocina-mesa" style="color:#f39c12">📝 ${p.notas}</div>` : ''}
       ${p.comprobante_url ? `<div class="comp-badge" onclick="verComprobante('${p.comprobante_url}')">🧾 Ver comprobante</div>` : ''}
