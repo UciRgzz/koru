@@ -102,30 +102,23 @@ function usarUbicacion() {
         );
         const data = await res.json();
         const a    = data.address || {};
-        const calle    = a.road || a.pedestrian || a.footway || a.residential || '';
-        const numero   = a.house_number || '';
-        const calleNum = calle ? (numero ? `${calle} ${numero}` : calle) : '';
-        const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || '';
-        const ciudad   = a.city || a.town || a.village || a.municipality || '';
-        const estadoAbrev = {
+        const estados = {
           'Nuevo León':'NL','Jalisco':'JAL','Ciudad de México':'CDMX',
           'Coahuila de Zaragoza':'COAH','Tamaulipas':'TAMS','Veracruz de Ignacio de la Llave':'VER',
           'Sonora':'SON','Chihuahua':'CHIH','Baja California':'BC','Sinaloa':'SIN',
           'Oaxaca':'OAX','Guerrero':'GRO','Michoacán de Ocampo':'MICH','Puebla':'PUE',
-        }[a.state] || (a.state ? a.state.substring(0,3).toUpperCase() : '');
-        const ciudadNL = ciudad ? `${ciudad}${estadoAbrev ? ' '+estadoAbrev : ''}` : '';
-        const partes   = [calleNum, colonia, ciudadNL].filter(Boolean);
+        };
+        const abrev   = estados[a.state] || (a.state ? a.state.substring(0,3).toUpperCase() : '');
+        const calle   = a.road || a.pedestrian || a.footway || a.residential || '';
+        const numero  = a.house_number || '';
+        const calleNum = calle ? (numero ? `${calle} ${numero}` : calle) : '';
+        const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || '';
+        const ciudad   = a.city || a.town || a.village || a.municipality || '';
+        const ciudadNL = ciudad ? `${ciudad}${abrev ? ' '+abrev : ''}` : '';
 
-        let dir;
-        if (partes.length >= 2) {
-          dir = partes.join(', ');
-        } else {
-          // Filtrar partes numéricas (CP) y el nombre del estado largo
-          const dp = (data.display_name || '').split(',')
-            .map(s => s.trim())
-            .filter(s => s && !/^\d+$/.test(s) && s !== a.state && s !== a.postcode);
-          dir = dp.slice(0, 3).join(', ') || ciudadNL || data.display_name;
-        }
+        // Construir desde las partes más específicas disponibles
+        const partes = [calleNum, colonia, ciudadNL].filter(Boolean);
+        const dir = partes.length >= 2 ? partes.join(', ') : ciudadNL || ciudad;
 
         document.getElementById('clienteDireccion').value = dir;
         toast('📍 Ubicación detectada', 'success');
