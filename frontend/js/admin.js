@@ -214,7 +214,6 @@ async function cargarPedidos() {
         <td>${hora}</td>
         <td style="display:flex;gap:.3rem;flex-wrap:wrap">
           <button class="btn-accion btn-ver" onclick="verDetalle(${p.id})">👁 Ver</button>
-          ${p.estado === 'entregado' && p.metodo_pago === 'efectivo' ? `<button class="btn-accion btn-wp-comp" onclick="generarComprobanteDesdeId(${p.id})">📱 Comprobante</button>` : ''}
         </td>
       </tr>
     `;
@@ -338,7 +337,7 @@ async function cargarComprobantes() {
           </a>
         </td>
         <td style="font-size:.82rem;color:#64748B">${hora}</td>
-        <td><button class="btn-accion btn-ver" onclick="verDetalle(${p.id})">👁 Ver</button></td>
+        <td><button class="btn-accion btn-wp-comp" onclick="generarComprobanteDesdeId(${p.id})">📱 Comprobante</button></td>
       </tr>
     `;
   }).join('');
