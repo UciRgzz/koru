@@ -261,7 +261,10 @@
             <button type="button" class="btn-editar-dir" onclick="editarDireccion()">Editar</button>
           </div>
           <div id="inputDireccionWrap">
-            <input type="text" id="clienteDireccion" placeholder="📍 Dirección de entrega (ej: Residencia A, piso 2) *" />
+            <div class="input-gps-wrap">
+              <input type="text" id="clienteDireccion" placeholder="📍 Dirección de entrega *" />
+              <button type="button" id="btnGps" class="btn-gps" onclick="usarUbicacion()" title="Detectar mi ubicación">🎯</button>
+            </div>
           </div>
         </div>
         <p class="zona-entrega-nota">🛵 Entrega gratis · Universidad de Montemorelos y alrededores</p>

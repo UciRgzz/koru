@@ -415,30 +415,33 @@ async function generarComprobanteImagen(p) {
       const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent('Aquí tu comprobante de compra KORU 🧾')}`;
 
       try {
-        // Móvil: Web Share API → hoja de compartir con la imagen lista
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `Comprobante KORU #${p.numero_pedido}` });
-          cerrarModalComprobante();
-          return;
-        }
-
-        // Escritorio / fallback: copiar imagen al portapapeles + abrir chat directo
+        // Copiar imagen al portapapeles para pegar en el chat
         let copiada = false;
         try {
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
           copiada = true;
-        } catch { /* portapapeles no disponible */ }
+        } catch { /* portapapeles no disponible, se descarga */ }
 
-        window.open(waUrl, '_blank');
+        if (!copiada) {
+          // Descargar imagen si clipboard falla
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(_compBlob);
+          a.download = `comp-${p.numero_pedido}.png`;
+          a.click();
+        }
+
+        // Abrir chat directo del cliente (funciona sin tenerlo en contactos)
+        window.open(`https://wa.me/${phone}`, '_blank');
+
         toast(
           copiada
-            ? '✅ Chat abierto · Pega la imagen en el chat (Ctrl+V) y envía'
-            : '✅ Chat abierto · Adjunta la imagen manualmente',
-          'success', 7000
+            ? '✅ Chat abierto · Pega la imagen (Ctrl+V o mantén presionado → Pegar) y envía'
+            : '✅ Chat abierto · La imagen se descargó, adjúntala en el chat',
+          'success', 8000
         );
         cerrarModalComprobante();
       } catch (err) {
-        if (err.name !== 'AbortError') toast('Error: ' + err.message, 'error');
+        toast('Error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📱 Enviar por WhatsApp';

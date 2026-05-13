@@ -88,6 +88,42 @@ function editarDireccion() {
   document.getElementById('clienteDireccion').focus();
 }
 
+function usarUbicacion() {
+  const btn = document.getElementById('btnGps');
+  if (!navigator.geolocation) { toast('Tu navegador no soporta geolocalización', 'warning'); return; }
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    async ({ coords }) => {
+      try {
+        const res  = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=es`,
+          { headers: { 'User-Agent': 'KORUBebidas/1.0' } }
+        );
+        const data = await res.json();
+        const a    = data.address || {};
+        const calle = a.road ? (a.house_number ? `${a.road} ${a.house_number}` : a.road) : '';
+        const colonia = a.suburb || a.neighbourhood || a.quarter || '';
+        const ciudad  = a.city  || a.town || a.village || a.municipality || '';
+        const dir = [calle, colonia, ciudad].filter(Boolean).join(', ') || data.display_name;
+        document.getElementById('clienteDireccion').value = dir;
+        toast('📍 Ubicación detectada', 'success');
+      } catch {
+        toast('No se pudo convertir la ubicación', 'error');
+      } finally {
+        btn.textContent = '🎯';
+        btn.disabled = false;
+      }
+    },
+    (err) => {
+      toast('No se pudo acceder a la ubicación', 'warning');
+      btn.textContent = '🎯';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
 // ── Carga inicial ──────────────────────────────────────────────
 async function init() {
   await cargarCategorias();

@@ -952,6 +952,31 @@ body {
 }
 .btn-editar-dir:hover { background: #3DBDB7; color: white; }
 
+/* ── Input dirección con botón GPS ──────────────────────────── */
+.input-gps-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-gps-wrap input {
+  width: 100%;
+  padding-right: 2.8rem;
+}
+.btn-gps {
+  position: absolute;
+  right: .55rem;
+  background: none;
+  border: none;
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: .2rem;
+  line-height: 1;
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.btn-gps:hover { transform: scale(1.25); }
+.btn-gps:disabled { opacity: .5; cursor: default; }
+
 /* ── Selector método de pago (carrito cliente) ───────────────── */
 .metodo-pago-selector {
   display: flex;
