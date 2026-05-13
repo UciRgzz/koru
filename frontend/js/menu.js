@@ -2,12 +2,15 @@ const API = '';
 let carrito = [];
 let productos = [];
 let metodoPago = 'efectivo';
-let tipoLeche = 'carnation';
+let tipoLeche = 'clasica';
+let extraLeche = 0;
 
-function seleccionarLeche(btn, tipo) {
+function seleccionarLeche(btn, tipo, extra) {
   document.querySelectorAll('.leche-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   tipoLeche = tipo;
+  extraLeche = extra || 0;
+  actualizarUI();
 }
 
 function seleccionarMetodo(btn, metodo) {
@@ -150,7 +153,8 @@ function cambiarCantidad(productoId, delta) {
 }
 
 function actualizarUI() {
-  const total = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
+  const subtotal = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
+  const total = subtotal + (carrito.length > 0 ? extraLeche : 0);
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0);
 
   document.getElementById('badgeCarrito').textContent = totalItems;
@@ -217,6 +221,7 @@ async function enviarPedido() {
     formData.append('direccion', direccion);
     formData.append('metodo_pago', metodoPago);
     formData.append('tipo_leche', tipoLeche);
+    formData.append('extra_leche', extraLeche);
     if (notas) formData.append('notas', notas);
     formData.append('items', JSON.stringify(
       carrito.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad }))

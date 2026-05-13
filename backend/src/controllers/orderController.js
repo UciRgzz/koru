@@ -13,7 +13,7 @@ async function crearPedido(req, res) {
   const conn = await db.connect();
   try {
     await conn.query('BEGIN');
-    const { nombre, telefono, notas, metodo_pago, direccion, tipo_leche } = req.body;
+    const { nombre, telefono, notas, metodo_pago, direccion, tipo_leche, extra_leche } = req.body;
     // items llega como JSON string cuando se envía con FormData
     const items = typeof req.body.items === 'string'
       ? JSON.parse(req.body.items)
@@ -68,6 +68,10 @@ async function crearPedido(req, res) {
         notas: item.notas || null,
       });
     }
+
+    // Agregar cargo por leche especial
+    const cargoLeche = parseFloat(extra_leche) || 0;
+    if (cargoLeche > 0) total += cargoLeche;
 
     // Crear pedido
     const numeroPedido = generarNumeroPedido();

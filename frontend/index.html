@@ -255,13 +255,19 @@
         <p class="zona-entrega-nota">🛵 Entrega gratis · Universidad de Montemorelos y alrededores</p>
         <textarea id="clienteNotas" placeholder="Notas especiales (ej: sin azúcar, tamaño extra...)" rows="2"></textarea>
 
-        <h3 style="margin-top:.6rem">🥛 ¿Qué tipo de leche?</h3>
-        <div class="metodo-pago-selector">
-          <button type="button" class="leche-btn active" onclick="seleccionarLeche(this,'carnation')">
-            🥛<br>Leche Carnation
+        <h3 style="margin-top:.6rem">🥛 ¿Leche especial? <span style="font-size:.75rem;font-weight:400;color:#888">(Carnation/Condensada incluida)</span></h3>
+        <div class="leche-selector">
+          <button type="button" class="leche-btn active" onclick="seleccionarLeche(this,'clasica',0)">
+            🥛<span>Clásica</span><small>Incluida</small>
           </button>
-          <button type="button" class="leche-btn" onclick="seleccionarLeche(this,'condensada')">
-            🥛<br>Leche Condensada
+          <button type="button" class="leche-btn" onclick="seleccionarLeche(this,'almendra',5)">
+            🌰<span>Almendra</span><small>+$5</small>
+          </button>
+          <button type="button" class="leche-btn" onclick="seleccionarLeche(this,'soya',5)">
+            🌱<span>Soya</span><small>+$5</small>
+          </button>
+          <button type="button" class="leche-btn" onclick="seleccionarLeche(this,'coco',5)">
+            🥥<span>Coco</span><small>+$5</small>
           </button>
         </div>
 
