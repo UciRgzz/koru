@@ -240,6 +240,9 @@ function abrirCarrito() {
   cargarDatosGuardados();
   document.getElementById('carritoPanel').classList.add('abierto');
   document.getElementById('overlay').classList.add('visible');
+  if (!localStorage.getItem('koru_direccion')) {
+    usarUbicacion();
+  }
 }
 function cerrarCarrito() {
   document.getElementById('carritoPanel').classList.remove('abierto');
