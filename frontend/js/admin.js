@@ -403,26 +403,42 @@ async function generarComprobanteImagen(p) {
       a.click();
     };
 
-    // Botón WhatsApp — envía al servidor, Twilio manda la imagen al cliente
+    // Botón WhatsApp — abre el chat del cliente con la imagen lista
     document.getElementById('btnEnviarWA').onclick = async () => {
       if (!_compBlob) return;
-      const btn = document.getElementById('btnEnviarWA');
-      btn.disabled = true;
-      btn.textContent = 'Enviando...';
+      const btn  = document.getElementById('btnEnviarWA');
+      btn.disabled  = true;
+      btn.textContent = 'Abriendo...';
+
+      const file  = new File([_compBlob], `comp-${p.numero_pedido}.png`, { type: 'image/png' });
+      const phone = _compTel.startsWith('52') ? _compTel : `52${_compTel}`;
+      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent('Aquí tu comprobante de compra KORU 🧾')}`;
+
       try {
-        const form = new FormData();
-        form.append('imagen', new File([_compBlob], `comp-${p.numero_pedido}.png`, { type: 'image/png' }));
-        const res  = await fetch(`/api/pedidos/${p.id}/enviar-comprobante`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
-          body: form,
-        });
-        const json = await res.json();
-        if (!json.ok) throw new Error(json.mensaje);
-        toast('✅ Comprobante enviado por WhatsApp', 'success');
+        // Móvil: Web Share API → hoja de compartir con la imagen lista
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: `Comprobante KORU #${p.numero_pedido}` });
+          cerrarModalComprobante();
+          return;
+        }
+
+        // Escritorio / fallback: copiar imagen al portapapeles + abrir chat directo
+        let copiada = false;
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
+          copiada = true;
+        } catch { /* portapapeles no disponible */ }
+
+        window.open(waUrl, '_blank');
+        toast(
+          copiada
+            ? '✅ Chat abierto · Pega la imagen en el chat (Ctrl+V) y envía'
+            : '✅ Chat abierto · Adjunta la imagen manualmente',
+          'success', 7000
+        );
         cerrarModalComprobante();
       } catch (err) {
-        toast('Error: ' + err.message, 'error');
+        if (err.name !== 'AbortError') toast('Error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📱 Enviar por WhatsApp';

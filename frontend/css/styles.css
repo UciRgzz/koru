@@ -918,6 +918,40 @@ body {
 /* ── Admin body fondo ────────────────────────────────────────── */
 .admin-body { background: var(--gray-50); }
 
+/* ── Tarjeta de dirección guardada (carrito cliente) ─────────── */
+#entregaBloque { display: flex; flex-direction: column; }
+.entrega-card {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  background: #F0FDF9;
+  border: 1.5px solid #B2DFDB;
+  border-radius: 12px;
+  padding: .7rem .9rem;
+}
+.entrega-card-icono { font-size: 1.15rem; flex-shrink: 0; }
+.entrega-card-texto {
+  flex: 1;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #0A5C56;
+  line-height: 1.4;
+}
+.btn-editar-dir {
+  background: white;
+  border: 1.5px solid #3DBDB7;
+  color: #0A5C56;
+  border-radius: 8px;
+  padding: .28rem .7rem;
+  font-size: .78rem;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+.btn-editar-dir:hover { background: #3DBDB7; color: white; }
+
 /* ── Selector método de pago (carrito cliente) ───────────────── */
 .metodo-pago-selector {
   display: flex;

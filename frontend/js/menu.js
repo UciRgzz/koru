@@ -67,6 +67,27 @@ function actualizarBotonEnvio() {
   }
 }
 
+// ── Datos guardados (localStorage) ────────────────────────────
+function cargarDatosGuardados() {
+  const dir = localStorage.getItem('koru_direccion');
+  const nom = localStorage.getItem('koru_nombre');
+  const tel = localStorage.getItem('koru_telefono');
+  if (nom) document.getElementById('clienteNombre').value = nom;
+  if (tel) document.getElementById('clienteTelefono').value = tel;
+  if (dir) {
+    document.getElementById('clienteDireccion').value = dir;
+    document.getElementById('entregaDirTexto').textContent = dir;
+    document.getElementById('cardDireccion').classList.remove('hidden');
+    document.getElementById('inputDireccionWrap').classList.add('hidden');
+  }
+}
+
+function editarDireccion() {
+  document.getElementById('cardDireccion').classList.add('hidden');
+  document.getElementById('inputDireccionWrap').classList.remove('hidden');
+  document.getElementById('clienteDireccion').focus();
+}
+
 // ── Carga inicial ──────────────────────────────────────────────
 async function init() {
   await cargarCategorias();
@@ -180,6 +201,7 @@ function actualizarUI() {
 
 // ── Panel carrito ─────────────────────────────────────────────
 function abrirCarrito() {
+  cargarDatosGuardados();
   document.getElementById('carritoPanel').classList.add('abierto');
   document.getElementById('overlay').classList.add('visible');
 }
@@ -231,9 +253,13 @@ async function enviarPedido() {
       formData.append('comprobante', document.getElementById('comprobanteFile').files[0]);
     }
 
+    localStorage.setItem('koru_nombre', nombre);
+    localStorage.setItem('koru_telefono', telefono);
+    localStorage.setItem('koru_direccion', direccion);
+
     const res = await fetch(`${API}/api/pedidos`, {
       method: 'POST',
-      body: formData, // Sin Content-Type: el browser lo pone automático con boundary
+      body: formData,
     });
     const json = await res.json();
     if (!json.ok) throw new Error(json.mensaje);

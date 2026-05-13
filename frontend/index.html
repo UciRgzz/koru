@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KORU - Menú</title>
+  <title>KORU Bebidas · Tapiocas en Montemorelos NL</title>
+  <meta name="description" content="KORU – Tapiocas artesanales estilo Sago Tailandés en Montemorelos, Nuevo León. Fresa, Mango, Piña Colada. Entrega gratis a la Universidad de Montemorelos y alrededores. ¡Haz tu pedido en línea!" />
+  <meta name="keywords" content="tapioca Montemorelos, KORU bebidas, tapioca NL, pedidos en línea Montemorelos, bebidas Montemorelos" />
   <link rel="icon" type="image/jpeg" href="/img/Koru_logo.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -251,7 +253,17 @@
         <h3>Tus datos</h3>
         <input type="text" id="clienteNombre" placeholder="Tu nombre *" required />
         <input type="tel" id="clienteTelefono" placeholder="WhatsApp (ej: +521XXXXXXXXXX) *" required />
-        <input type="text" id="clienteDireccion" placeholder="📍 Dirección de entrega (ej: Residencia A, piso 2) *" required />
+        <!-- Dirección guardada / editable -->
+        <div id="entregaBloque">
+          <div class="entrega-card hidden" id="cardDireccion">
+            <span class="entrega-card-icono">📍</span>
+            <span class="entrega-card-texto" id="entregaDirTexto"></span>
+            <button type="button" class="btn-editar-dir" onclick="editarDireccion()">Editar</button>
+          </div>
+          <div id="inputDireccionWrap">
+            <input type="text" id="clienteDireccion" placeholder="📍 Dirección de entrega (ej: Residencia A, piso 2) *" />
+          </div>
+        </div>
         <p class="zona-entrega-nota">🛵 Entrega gratis · Universidad de Montemorelos y alrededores</p>
         <textarea id="clienteNotas" placeholder="Notas especiales (ej: sin azúcar, tamaño extra...)" rows="2"></textarea>
 
@@ -286,9 +298,10 @@
           <div class="cuenta-datos">
             <p class="cuenta-titulo">📋 Datos para transferir</p>
             <!--  Cambia estos datos por los de tu cuenta -->
-            <div class="cuenta-fila"><span>Banco</span><strong>BBVA</strong></div>
-            <div class="cuenta-fila"><span>Titular</span><strong>KORU Tapiocas</strong></div>
-            <div class="cuenta-fila"><span>CLABE</span><strong>012 345 678 901 234 5</strong></div>
+            <div class="cuenta-fila"><span>Banco</span><strong>BANREGIO</strong></div>
+            <div class="cuenta-fila"><span>Titular</span><strong>Nathan Esteban Jiménez Armenta</strong></div>
+            <div class="cuenta-fila"><span>N° Cuenta</span><strong>8498-9483-0013</strong></div>
+            <div class="cuenta-fila"><span>Tarjeta</span><strong>4741-7435-8352-8196</strong></div>
             <div class="cuenta-fila"><span>Concepto</span><strong>Tapioca KORU</strong></div>
           </div>
           <label class="upload-label" id="uploadLabel" for="comprobanteFile">
