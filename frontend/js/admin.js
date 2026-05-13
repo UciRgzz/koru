@@ -402,59 +402,44 @@ async function generarComprobanteImagen(p) {
       a.click();
     };
 
-    // Botón WhatsApp — abre el chat del cliente con la imagen lista
+    // Botón WhatsApp — descarga imagen y abre chat directo con el cliente
     document.getElementById('btnEnviarWA').onclick = async () => {
       if (!_compBlob) return;
-      const btn  = document.getElementById('btnEnviarWA');
-      btn.disabled  = true;
+      const btn = document.getElementById('btnEnviarWA');
+      btn.disabled = true;
       btn.textContent = 'Abriendo...';
 
-      const file  = new File([_compBlob], `comp-${p.numero_pedido}.png`, { type: 'image/png' });
-      const phone = _compTel.replace(/\D/g, '');
+      const phone   = _compTel.replace(/\D/g, '');
       const phoneWA = phone.startsWith('52') ? phone : `52${phone}`;
+      const waText  = encodeURIComponent('Aquí tu comprobante de compra KORU 🧾');
+      const esMobil = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       try {
-        // MÓVIL: Web Share API — abre el menú nativo con la imagen adjunta
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            text: 'Aquí tu comprobante de compra KORU 🧾',
-          });
-          cerrarModalComprobante();
-          return;
-        }
+        // Descargar imagen para que el admin la tenga lista para adjuntar
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(_compBlob);
+        a.download = `comp-${p.numero_pedido}.png`;
+        a.click();
 
-        // PC: copiar imagen al portapapeles y abrir chat
-        let copiada = false;
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
-          copiada = true;
-        } catch { /* portapapeles no disponible */ }
+        await new Promise(r => setTimeout(r, 400));
 
-        if (!copiada) {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(_compBlob);
-          a.download = `comp-${p.numero_pedido}.png`;
-          a.click();
-        }
-
-        const waText = encodeURIComponent('Aquí tu comprobante de compra KORU 🧾');
-        const esMobil = /Mobi|Android/i.test(navigator.userAgent);
         if (esMobil) {
+          // iOS/Android: va directo al chat sin necesitar contacto guardado
           window.location.href = `whatsapp://send?phone=${phoneWA}&text=${waText}`;
         } else {
+          // PC: copiar al portapapeles y abrir WhatsApp Web
+          try {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
+            toast('✅ Chat abierto · Pega la imagen con Ctrl+V y envía', 'success', 8000);
+          } catch {
+            toast('✅ Chat abierto · La imagen se descargó, adjúntala en el chat', 'success', 8000);
+          }
           window.open(`https://wa.me/${phoneWA}?text=${waText}`, '_blank');
         }
 
-        toast(
-          copiada
-            ? '✅ Chat abierto · Pega la imagen con Ctrl+V y envía'
-            : '✅ Chat abierto · La imagen se descargó, adjúntala en el chat',
-          'success', 8000
-        );
         cerrarModalComprobante();
       } catch (err) {
-        if (err.name !== 'AbortError') toast('Error: ' + err.message, 'error');
+        toast('Error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📱 Enviar por WhatsApp';
