@@ -2002,6 +2002,18 @@ body {
   .filtros input,
   .filtros select { font-size: .8rem; padding: .4rem .7rem; }
 
+  /* Pedidos: ocultar Método Pago (col3) y Hora (col6) */
+  #tabPedidos .tabla th:nth-child(3),
+  #tabPedidos .tabla td:nth-child(3),
+  #tabPedidos .tabla th:nth-child(6),
+  #tabPedidos .tabla td:nth-child(6) { display: none; }
+
+  /* Comprobantes: ocultar imagen comprobante (col5) y Fecha (col6) */
+  #tabComprobantes .tabla th:nth-child(5),
+  #tabComprobantes .tabla td:nth-child(5),
+  #tabComprobantes .tabla th:nth-child(6),
+  #tabComprobantes .tabla td:nth-child(6) { display: none; }
+
   /* ── Modales: ocupan todo el ancho ─────────────────────────── */
   .modal-content  { width: 95vw; max-width: 95vw; padding: 1.1rem; }
   .modal-grande   { width: 95vw; max-width: 95vw; }

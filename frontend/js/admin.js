@@ -438,7 +438,13 @@ async function generarComprobanteImagen(p) {
           a.click();
         }
 
-        window.open(`https://wa.me/${phoneWA}`, '_blank');
+        const waText = encodeURIComponent('Aquí tu comprobante de compra KORU 🧾');
+        const esMobil = /Mobi|Android/i.test(navigator.userAgent);
+        if (esMobil) {
+          window.location.href = `whatsapp://send?phone=${phoneWA}&text=${waText}`;
+        } else {
+          window.open(`https://wa.me/${phoneWA}?text=${waText}`, '_blank');
+        }
 
         toast(
           copiada
