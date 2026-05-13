@@ -411,37 +411,45 @@ async function generarComprobanteImagen(p) {
       btn.textContent = 'Abriendo...';
 
       const file  = new File([_compBlob], `comp-${p.numero_pedido}.png`, { type: 'image/png' });
-      const phone = _compTel.startsWith('52') ? _compTel : `52${_compTel}`;
-      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent('Aquí tu comprobante de compra KORU 🧾')}`;
+      const phone = _compTel.replace(/\D/g, '');
+      const phoneWA = phone.startsWith('52') ? phone : `52${phone}`;
 
       try {
-        // Copiar imagen al portapapeles para pegar en el chat
+        // MÓVIL: Web Share API — abre el menú nativo con la imagen adjunta
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            text: 'Aquí tu comprobante de compra KORU 🧾',
+          });
+          cerrarModalComprobante();
+          return;
+        }
+
+        // PC: copiar imagen al portapapeles y abrir chat
         let copiada = false;
         try {
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
           copiada = true;
-        } catch { /* portapapeles no disponible, se descarga */ }
+        } catch { /* portapapeles no disponible */ }
 
         if (!copiada) {
-          // Descargar imagen si clipboard falla
           const a = document.createElement('a');
           a.href = URL.createObjectURL(_compBlob);
           a.download = `comp-${p.numero_pedido}.png`;
           a.click();
         }
 
-        // Abrir chat directo del cliente (funciona sin tenerlo en contactos)
-        window.open(`https://wa.me/${phone}`, '_blank');
+        window.open(`https://wa.me/${phoneWA}`, '_blank');
 
         toast(
           copiada
-            ? '✅ Chat abierto · Pega la imagen (Ctrl+V o mantén presionado → Pegar) y envía'
+            ? '✅ Chat abierto · Pega la imagen con Ctrl+V y envía'
             : '✅ Chat abierto · La imagen se descargó, adjúntala en el chat',
           'success', 8000
         );
         cerrarModalComprobante();
       } catch (err) {
-        toast('Error: ' + err.message, 'error');
+        if (err.name !== 'AbortError') toast('Error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📱 Enviar por WhatsApp';
