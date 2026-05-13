@@ -502,7 +502,6 @@ function fechaLocalHoy() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-document.getElementById('filtroPedidoFecha').value = fechaLocalHoy();
-document.getElementById('filtroCompFecha').value   = fechaLocalHoy();
+// No preseleccionar fecha: Pedidos y Comprobantes muestran todo por defecto
 
 iniciarTablero();
