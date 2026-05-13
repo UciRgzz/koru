@@ -102,10 +102,22 @@ function usarUbicacion() {
         );
         const data = await res.json();
         const a    = data.address || {};
-        const calle = a.road ? (a.house_number ? `${a.road} ${a.house_number}` : a.road) : '';
-        const colonia = a.suburb || a.neighbourhood || a.quarter || '';
-        const ciudad  = a.city  || a.town || a.village || a.municipality || '';
-        const dir = [calle, colonia, ciudad].filter(Boolean).join(', ') || data.display_name;
+        const calle    = a.road || a.pedestrian || a.footway || a.residential || '';
+        const numero   = a.house_number || '';
+        const calleNum = calle ? (numero ? `${calle} ${numero}` : calle) : '';
+        const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || '';
+        const ciudad   = a.city || a.town || a.village || a.municipality || '';
+        const partes   = [calleNum, colonia, ciudad].filter(Boolean);
+
+        let dir;
+        if (partes.length >= 2) {
+          dir = partes.join(', ');
+        } else {
+          // Nominatim siempre devuelve display_name completo; tomar las primeras 3 partes
+          const dp = (data.display_name || '').split(',').map(s => s.trim()).filter(Boolean);
+          dir = dp.slice(0, 3).join(', ') || data.display_name;
+        }
+
         document.getElementById('clienteDireccion').value = dir;
         toast('📍 Ubicación detectada', 'success');
       } catch {
@@ -120,7 +132,7 @@ function usarUbicacion() {
       btn.textContent = '🎯';
       btn.disabled = false;
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: true, timeout: 15000 }
   );
 }
 
