@@ -175,7 +175,7 @@ async function descargarRecibo() {
     if (!json.ok) { toast('No se pudo obtener el recibo: ' + (json.mensaje || ''), 'error'); return; }
 
     const p = json.data;
-    const metodos = { efectivo: '💵 Efectivo', transferencia: '📱 Transferencia', tarjeta: '💳 Tarjeta' };
+    const metodos = { efectivo: ' Efectivo', transferencia: ' Transferencia', tarjeta: ' Tarjeta' };
     const leches  = { clasica: 'Leche Carnation', condensada: 'Leche Condensada', almendra: 'Almendra', soya: 'Soya', coco: 'Coco' };
 
     document.getElementById('riNumero').textContent  = `#${p.numero_pedido}`;
