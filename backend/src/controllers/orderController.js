@@ -233,7 +233,7 @@ async function getRecibo(req, res) {
               p.direccion, p.notas, p.creado_en,
               c.nombre AS cliente_nombre, c.telefono AS cliente_telefono
        FROM pedidos p JOIN clientes c ON p.cliente_id = c.id
-       WHERE p.numero_pedido = $1 AND p.estado = 'entregado'`,
+       WHERE p.numero_pedido = $1 AND p.estado IN ('entregado','listo')`,
       [req.params.numero]
     );
     if (!rows.length) return res.status(404).json({ ok: false, mensaje: 'Recibo no disponible' });

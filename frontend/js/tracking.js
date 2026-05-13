@@ -140,7 +140,7 @@ function actualizarTracking(estado, tiempoEstimado) {
     });
   }
 
-  if (estado === 'entregado') mostrarBotonRecibo();
+  if (estado === 'entregado' || estado === 'listo') mostrarBotonRecibo();
 }
 
 // ── Notificación cuando el pedido está listo ──────────────────
@@ -167,8 +167,10 @@ function mostrarBotonRecibo() {
 async function descargarRecibo() {
   try {
     const res  = await fetch(`/api/pedidos/recibo/${encodeURIComponent(numeroPedido)}`);
-    const json = await res.json();
-    if (!json.ok) { toast('No se pudo obtener el recibo', 'error'); return; }
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch { toast('Error del servidor: ' + text.substring(0, 80), 'error'); return; }
+    if (!json.ok) { toast('No se pudo obtener el recibo: ' + (json.mensaje || ''), 'error'); return; }
 
     const p = json.data;
     const metodos = { efectivo: '💵 Efectivo', transferencia: '📱 Transferencia', tarjeta: '💳 Tarjeta' };
