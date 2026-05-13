@@ -402,7 +402,7 @@ async function generarComprobanteImagen(p) {
       a.click();
     };
 
-    // Botón WhatsApp — descarga imagen y abre chat directo con el cliente
+    // Botón WhatsApp
     document.getElementById('btnEnviarWA').onclick = async () => {
       if (!_compBlob) return;
       const btn = document.getElementById('btnEnviarWA');
@@ -411,35 +411,41 @@ async function generarComprobanteImagen(p) {
 
       const phone   = _compTel.replace(/\D/g, '');
       const phoneWA = phone.startsWith('52') ? phone : `52${phone}`;
-      const waText  = encodeURIComponent('Aquí tu comprobante de compra KORU 🧾');
+      const file    = new File([_compBlob], `comp-${p.numero_pedido}.png`, { type: 'image/png' });
       const esMobil = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       try {
-        // Descargar imagen para que el admin la tenga lista para adjuntar
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(_compBlob);
-        a.download = `comp-${p.numero_pedido}.png`;
-        a.click();
-
-        await new Promise(r => setTimeout(r, 400));
-
-        if (esMobil) {
-          // iOS/Android: va directo al chat sin necesitar contacto guardado
-          window.location.href = `whatsapp://send?phone=${phoneWA}&text=${waText}`;
+        if (esMobil && navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Móvil: compartir imagen directamente — en WhatsApp busca al cliente por su número
+          toast(`📱 Selecciona WhatsApp → busca el número: ${_compTel}`, 'info', 10000);
+          await navigator.share({ files: [file], text: 'Comprobante KORU 🧾' });
+          cerrarModalComprobante();
         } else {
-          // PC: copiar al portapapeles y abrir WhatsApp Web
+          // PC: copiar imagen al portapapeles y abrir chat directo
+          let copiada = false;
           try {
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': _compBlob })]);
-            toast('✅ Chat abierto · Pega la imagen con Ctrl+V y envía', 'success', 8000);
-          } catch {
-            toast('✅ Chat abierto · La imagen se descargó, adjúntala en el chat', 'success', 8000);
-          }
-          window.open(`https://wa.me/${phoneWA}?text=${waText}`, '_blank');
-        }
+            copiada = true;
+          } catch { /* sin acceso al portapapeles */ }
 
-        cerrarModalComprobante();
+          if (!copiada) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(_compBlob);
+            a.download = `comp-${p.numero_pedido}.png`;
+            a.click();
+          }
+
+          window.open(`https://wa.me/${phoneWA}`, '_blank');
+          toast(
+            copiada
+              ? '✅ Chat abierto · Pega la imagen con Ctrl+V y envía'
+              : '✅ Chat abierto · La imagen se descargó, adjúntala',
+            'success', 8000
+          );
+          cerrarModalComprobante();
+        }
       } catch (err) {
-        toast('Error: ' + err.message, 'error');
+        if (err.name !== 'AbortError') toast('Error: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📱 Enviar por WhatsApp';
