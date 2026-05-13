@@ -1,5 +1,5 @@
 const router  = require('express').Router();
-const { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen } = require('../controllers/orderController');
+const { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen, getRecibo } = require('../controllers/orderController');
 const { verificarToken } = require('../middleware/auth');
 const upload   = require('../middleware/upload');
 
@@ -8,6 +8,9 @@ router.post('/', upload.single('comprobante'), crearPedido);
 
 // GET estado por número de pedido: público — para la página de seguimiento del cliente
 router.get('/status/:numero', getEstadoPedido);
+
+// GET recibo público — solo disponible cuando el pedido está entregado
+router.get('/recibo/:numero', getRecibo);
 
 // GET y PATCH: solo admin autenticado
 router.get('/',    verificarToken, getPedidos);

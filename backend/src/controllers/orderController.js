@@ -226,4 +226,29 @@ async function enviarComprobanteImagen(req, res) {
   }
 }
 
-module.exports = { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen };
+async function getRecibo(req, res) {
+  try {
+    const { rows } = await db.query(
+      `SELECT p.numero_pedido, p.estado, p.total, p.metodo_pago, p.tipo_leche,
+              p.direccion, p.notas, p.creado_en,
+              c.nombre AS cliente_nombre, c.telefono AS cliente_telefono
+       FROM pedidos p JOIN clientes c ON p.cliente_id = c.id
+       WHERE p.numero_pedido = $1 AND p.estado = 'entregado'`,
+      [req.params.numero]
+    );
+    if (!rows.length) return res.status(404).json({ ok: false, mensaje: 'Recibo no disponible' });
+
+    const { rows: items } = await db.query(
+      `SELECT pi.cantidad, pi.precio_unitario, pr.nombre
+       FROM pedido_items pi JOIN productos pr ON pi.producto_id = pr.id
+       WHERE pi.pedido_id = (SELECT id FROM pedidos WHERE numero_pedido = $1)`,
+      [req.params.numero]
+    );
+
+    res.json({ ok: true, data: { ...rows[0], items } });
+  } catch (err) {
+    res.status(500).json({ ok: false, mensaje: err.message });
+  }
+}
+
+module.exports = { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen, getRecibo };

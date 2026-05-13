@@ -139,6 +139,8 @@ function actualizarTracking(estado, tiempoEstimado) {
       if (el) el.classList.remove('done', 'current');
     });
   }
+
+  if (estado === 'entregado') mostrarBotonRecibo();
 }
 
 // ── Notificación cuando el pedido está listo ──────────────────
@@ -154,6 +156,48 @@ function mostrarNotifListo() {
 
   // Scroll arriba para ver el banner
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Recibo del cliente ────────────────────────────────────────
+function mostrarBotonRecibo() {
+  const btn = document.getElementById('btnRecibo');
+  if (btn) btn.style.display = 'block';
+}
+
+async function descargarRecibo() {
+  try {
+    const res  = await fetch(`/api/pedidos/recibo/${encodeURIComponent(numeroPedido)}`);
+    const json = await res.json();
+    if (!json.ok) { toast('No se pudo obtener el recibo', 'error'); return; }
+
+    const p = json.data;
+    const metodos = { efectivo: '💵 Efectivo', transferencia: '📱 Transferencia', tarjeta: '💳 Tarjeta' };
+    const leches  = { clasica: 'Leche Carnation', condensada: 'Leche Condensada', almendra: 'Almendra', soya: 'Soya', coco: 'Coco' };
+
+    document.getElementById('riNumero').textContent  = `#${p.numero_pedido}`;
+    document.getElementById('riFecha').textContent   = new Date(p.creado_en).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    document.getElementById('riCliente').textContent = p.cliente_nombre;
+    document.getElementById('riTel').textContent     = p.cliente_telefono;
+    document.getElementById('riPago').textContent    = (metodos[p.metodo_pago] || p.metodo_pago) + (p.tipo_leche && p.tipo_leche !== 'clasica' ? ` · ${leches[p.tipo_leche] || p.tipo_leche}` : '');
+
+    const dirFila = document.getElementById('riDirFila');
+    if (p.direccion) {
+      document.getElementById('riDir').textContent = p.direccion;
+      dirFila.style.display = 'flex';
+    } else {
+      dirFila.style.display = 'none';
+    }
+
+    document.getElementById('riItems').innerHTML = (p.items || []).map(i =>
+      `<div class="ri-item"><span>${i.cantidad}x ${i.nombre}</span><span>$${(i.precio_unitario * i.cantidad).toFixed(2)}</span></div>`
+    ).join('');
+
+    document.getElementById('riTotal').lastElementChild.textContent = `$${Number(p.total).toFixed(2)}`;
+
+    window.print();
+  } catch (err) {
+    toast('Error al obtener el recibo', 'error');
+  }
 }
 
 // ── Indicador de conexión ─────────────────────────────────────
