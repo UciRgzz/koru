@@ -178,7 +178,8 @@ async function descargarRecibo() {
     const metodos = { efectivo: ' Efectivo', transferencia: ' Transferencia', tarjeta: ' Tarjeta' };
     const leches  = { clasica: 'Leche Carnation', condensada: 'Leche Condensada', almendra: 'Almendra', soya: 'Soya', coco: 'Coco' };
 
-    document.getElementById('riNumero').textContent  = `#${p.numero_pedido}`;
+    const shortNum = p.numero_pedido.split('-').pop();
+    document.getElementById('riNumero').textContent  = `Pedido #${shortNum}`;
     document.getElementById('riFecha').textContent   = new Date(p.creado_en).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
     document.getElementById('riCliente').textContent = p.cliente_nombre;
     document.getElementById('riTel').textContent     = p.cliente_telefono;
