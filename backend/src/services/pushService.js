@@ -14,6 +14,35 @@ async function guardarSuscripcion(numeroPedido, subscription) {
   );
 }
 
+async function guardarSuscripcionAdmin(usuarioId, subscription) {
+  await db.query(
+    'UPDATE usuarios SET push_subscription = $1 WHERE id = $2',
+    [JSON.stringify(subscription), usuarioId]
+  );
+}
+
+async function notificarAdmin(pedido) {
+  try {
+    const { rows } = await db.query(
+      "SELECT push_subscription FROM usuarios WHERE rol = 'admin' AND push_subscription IS NOT NULL"
+    );
+    if (!rows.length) return;
+
+    const payload = JSON.stringify({
+      titulo: `🛒 Nuevo pedido #${pedido.numero_pedido}`,
+      cuerpo: `${pedido.cliente_nombre} · $${Number(pedido.total).toFixed(2)}`,
+      url: '/admin',
+    });
+
+    await Promise.allSettled(
+      rows.map(r => webpush.sendNotification(JSON.parse(r.push_subscription), payload))
+    );
+    console.log(`📲 Push enviado a admins – pedido ${pedido.numero_pedido}`);
+  } catch (err) {
+    console.error('Push admin error:', err.message);
+  }
+}
+
 const MENSAJES = {
   confirmado:     { titulo: '✅ Pedido confirmado – KORU',     cuerpo: '¡Tu pedido fue confirmado! Pronto empezamos a prepararlo.' },
   en_preparacion: { titulo: '🧋 En preparación – KORU',        cuerpo: '¡Estamos preparando tu tapioca! Ya casi está...' },
@@ -46,4 +75,4 @@ async function notificarCliente(pedido) {
   }
 }
 
-module.exports = { guardarSuscripcion, notificarCliente };
+module.exports = { guardarSuscripcion, notificarCliente, guardarSuscripcionAdmin, notificarAdmin };

@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administración</title>
   <link rel="icon" type="image/jpeg" href="/img/Koru_logo.jpeg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="KORU Admin" />
+  <link rel="apple-touch-icon" href="/img/Koru_logo.jpeg" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body class="admin-body">
@@ -27,6 +32,11 @@
       </div>
     </div>
   </header>
+
+  <!-- Banner activar notificaciones -->
+  <div id="bannerPush" style="display:none;background:#7C3AED;color:white;text-align:center;padding:.75rem 1rem;font-size:.9rem;font-weight:600;cursor:pointer" onclick="suscribirAdminPush()">
+    🔔 Toca aquí para activar notificaciones de pedidos en tu teléfono
+  </div>
 
   <main class="admin-main">
 
@@ -192,6 +202,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/admin.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('SW registrado'))
+        .catch(e => console.warn('SW error:', e));
+    }
+  </script>
 </body>
 </html>
 

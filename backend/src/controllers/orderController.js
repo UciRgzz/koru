@@ -1,5 +1,5 @@
 const db = require('../config/database');
-const { notificarCliente } = require('../services/pushService');
+const { notificarCliente, notificarAdmin } = require('../services/pushService');
 const { enviarImagenWhatsApp } = require('../services/twilioService');
 
 function generarNumeroPedido() {
@@ -98,6 +98,8 @@ async function crearPedido(req, res) {
     const io = req.app.get('io');
     io.to('cocina').emit('nuevo_pedido', pedidoCompleto);
     io.to('admin').emit('nuevo_pedido', pedidoCompleto);
+
+    notificarAdmin(pedidoCompleto);
 
     res.status(201).json({ ok: true, data: pedidoCompleto });
   } catch (err) {

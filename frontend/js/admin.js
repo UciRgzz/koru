@@ -428,6 +428,54 @@ function notificarNuevoPedido(numero) {
   }
 }
 
+async function suscribirAdminPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      document.getElementById('bannerPush').style.display = 'block';
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.ready;
+
+    const res = await fetch('/api/push/vapid-public-key');
+    const { publicKey } = await res.json();
+
+    const existing = await reg.pushManager.getSubscription();
+    const subscription = existing || await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+
+    await fetch('/api/push/subscribe-admin', {
+      method: 'POST',
+      headers: authHeader(),
+      body: JSON.stringify({ subscription }),
+    });
+
+    document.getElementById('bannerPush').style.display = 'none';
+    toast('🔔 Notificaciones activadas', 'success', 3000);
+  } catch (err) {
+    console.warn('Push admin no disponible:', err.message);
+    document.getElementById('bannerPush').style.display = 'block';
+  }
+}
+
+function verificarEstadoPush() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  if (Notification.permission !== 'granted') {
+    document.getElementById('bannerPush').style.display = 'block';
+  }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
 function actualizarReloj() {
   const el = document.getElementById('fechaHora');
   if (el) el.textContent = new Date().toLocaleTimeString('es-ES');
@@ -439,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (infoEl && usuarioActual) infoEl.textContent = `👤 ${usuarioActual.nombre}`;
 });
 
-if ('Notification' in window) Notification.requestPermission();
+verificarEstadoPush();
 setInterval(actualizarReloj, 1000);
 setInterval(renderTablero, 30000);
 actualizarReloj();

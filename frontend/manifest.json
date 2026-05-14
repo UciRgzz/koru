@@ -1,0 +1,22 @@
+{
+  "name": "KORU Admin",
+  "short_name": "KORU",
+  "description": "Panel de administración KORU",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/img/Koru_logo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/img/Koru_logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
