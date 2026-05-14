@@ -250,17 +250,21 @@
       width: 320px;
       position: relative;
       font-family: 'Poppins', sans-serif;
+      border-radius: 18px;
+      overflow: hidden;
     }
     #reciboImprimible .ri-bg-img {
+      position: absolute;
+      top: 0; left: 0;
       width: 100%;
-      display: block;
-      border-radius: 18px;
+      height: 100%;
+      object-fit: fill;
+      z-index: 0;
     }
     #reciboImprimible .ri-content {
-      position: absolute;
-      top: 47%;
-      left: 0; right: 0;
-      padding: 0 1.4rem 1.6rem;
+      position: relative;
+      z-index: 1;
+      padding: 205px 1.4rem 1.8rem;
     }
     .ri-title {
       text-align: center;
