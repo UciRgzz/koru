@@ -201,7 +201,7 @@ async function descargarRecibo() {
 
     // Mostrar fuera de pantalla para que html2canvas lo capture
     const el = document.getElementById('reciboImprimible');
-    el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:320px;background:#fff;';
+    el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:320px;';
 
     const canvas = await html2canvas(el, {
       scale: 2.5,

@@ -248,47 +248,40 @@
     #reciboImprimible {
       display: none;
       width: 320px;
-      background: #FFFAF6;
-      border-radius: 20px;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-      box-shadow: 0 8px 32px rgba(0,0,0,.15);
-    }
-    .ri-header-wrap {
-      background: linear-gradient(180deg, #AEE3F0 0%, #D4F0F7 60%, #FFFAF6 100%);
-      padding: 1rem 1rem 0;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      min-height: 130px;
       position: relative;
+      font-family: 'Poppins', sans-serif;
     }
-    .ri-cup { width: 80px; height: 90px; object-fit: cover; object-position: top; border-radius: 8px; }
-    .ri-header-center { text-align: center; flex: 1; padding-bottom: .5rem; }
-    .ri-logo-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    #reciboImprimible .ri-bg-img {
+      width: 100%;
+      display: block;
+      border-radius: 18px;
+    }
+    #reciboImprimible .ri-content {
+      position: absolute;
+      top: 47%;
+      left: 0; right: 0;
+      padding: 0 1.4rem 1.6rem;
+    }
     .ri-title {
       text-align: center;
       color: #E91E8C;
       font-weight: 800;
-      font-size: .82rem;
-      letter-spacing: .12em;
-      padding: .75rem 1rem .2rem;
+      font-size: .78rem;
+      letter-spacing: .13em;
+      margin-bottom: .35rem;
     }
-    .ri-body { padding: 0 1.2rem 1.2rem; }
-    .ri-num  { text-align: center; font-weight: 800; color: #1a1a1a; font-size: 1.05rem; margin: .2rem 0 .15rem; }
-    .ri-fecha { text-align: center; color: #999; font-size: .72rem; margin-bottom: .8rem; }
-    .ri-sep  { border: none; border-top: 1.5px dashed #e0d0c8; margin: .7rem 0; }
-    .ri-fila { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; font-size: .8rem; }
-    .ri-icon-wrap { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+    .ri-num  { text-align: center; font-weight: 800; color: #1a1a1a; font-size: 1rem; margin: 0 0 .1rem; }
+    .ri-fecha { text-align: center; color: #999; font-size: .7rem; margin-bottom: .65rem; }
+    .ri-sep  { border: none; border-top: 1.5px dashed #ddd; margin: .55rem 0; }
+    .ri-fila { display: flex; align-items: center; gap: .45rem; padding: .22rem 0; font-size: .77rem; }
+    .ri-icon-wrap { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .72rem; flex-shrink: 0; }
     .ri-label { color: #888; flex: 1; }
-    .ri-fila-val { font-weight: 600; color: #333; text-align: right; }
-    .ri-items { margin: .4rem 0; }
-    .ri-item { display: flex; justify-content: space-between; font-size: .82rem; padding: .22rem 0; color: #444; }
-    .ri-total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem; padding: .6rem 0 .4rem; border-top: 2px solid #0A5C56; margin-top: .3rem; color: #0A5C56; }
-    .ri-gracias { text-align: center; color: #999; font-size: .73rem; margin-top: .6rem; }
-    .ri-footer { text-align: center; margin-top: .5rem; }
-    .ri-footer-logo { font-weight: 800; font-size: .85rem; color: #0A5C56; letter-spacing: .05em; }
-    .ri-footer-logo img { width: 18px; height: 18px; vertical-align: middle; border-radius: 50%; margin-right: 4px; }
+    .ri-fila-val { font-weight: 600; color: #333; text-align: right; max-width: 55%; }
+    .ri-items { margin: .3rem 0; }
+    .ri-item { display: flex; justify-content: space-between; font-size: .78rem; padding: .18rem 0; color: #444; }
+    .ri-total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: .95rem; padding: .5rem 0 .3rem; border-top: 2px solid #0A5C56; margin-top: .25rem; color: #0A5C56; }
+    .ri-gracias { text-align: center; color: #aaa; font-size: .7rem; margin-top: .5rem; }
+    .ri-footer { text-align: center; margin-top: .3rem; font-weight: 800; font-size: .8rem; color: #0A5C56; letter-spacing: .05em; }
 
     /* ── Botón volver ───────────────────────────────────────── */
     .btn-volver {
@@ -409,15 +402,9 @@
 
   <!-- Plantilla de recibo — descarga como imagen -->
   <div id="reciboImprimible">
-    <div class="ri-header-wrap">
-      <img class="ri-cup" src="/img/fresa.jpeg" alt="" crossorigin="anonymous" />
-      <div class="ri-header-center">
-        <img class="ri-logo-img" src="/img/Koru_logo.jpeg" alt="KORU" crossorigin="anonymous" />
-      </div>
-      <img class="ri-cup" src="/img/mango.jpeg" alt="" crossorigin="anonymous" />
-    </div>
-    <div class="ri-title">✦ &nbsp;RECIBO DE PAGO&nbsp; ✦</div>
-    <div class="ri-body">
+    <img class="ri-bg-img" src="/img/recibo_img.png" alt="" crossorigin="anonymous" />
+    <div class="ri-content">
+      <div class="ri-title">✦ &nbsp;RECIBO DE PAGO&nbsp; ✦</div>
       <div class="ri-num" id="riNumero"></div>
       <div class="ri-fecha" id="riFecha"></div>
       <hr class="ri-sep">
@@ -445,11 +432,7 @@
       <div class="ri-items" id="riItems"></div>
       <div class="ri-total-row"><span>TOTAL</span><span id="riTotal"></span></div>
       <p class="ri-gracias">¡Gracias por tu compra! 🩷</p>
-      <div class="ri-footer">
-        <span class="ri-footer-logo">
-          <img src="/img/Koru_logo.jpeg" alt="" crossorigin="anonymous" />KORU
-        </span>
-      </div>
+      <div class="ri-footer">K🌿RU</div>
     </div>
   </div>
 
