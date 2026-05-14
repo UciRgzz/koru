@@ -196,7 +196,7 @@ async function descargarRecibo() {
       `<div class="ri-item"><span>${i.cantidad}x ${i.nombre}</span><span>$${(i.precio_unitario * i.cantidad).toFixed(2)}</span></div>`
     ).join('');
 
-    document.getElementById('riTotal').lastElementChild.textContent = `$${Number(p.total).toFixed(2)}`;
+    document.getElementById('riTotal').textContent = `$${Number(p.total).toFixed(2)}`;
 
     window.print();
   } catch (err) {
