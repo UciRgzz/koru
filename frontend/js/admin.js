@@ -465,21 +465,25 @@ function notificarNuevoPedido(numero) {
 }
 
 async function suscribirAdminPush() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    toast('Tu dispositivo no soporta notificaciones push', 'warning'); return;
+  }
   try {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
       document.getElementById('bannerPush').style.display = 'block';
+      toast('Debes permitir las notificaciones', 'warning', 4000);
       return;
     }
 
     const reg = await navigator.serviceWorker.ready;
-
     const res = await fetch('/api/push/vapid-public-key');
     const { publicKey } = await res.json();
 
+    // Siempre forzar nueva suscripción para renovar el endpoint
     const existing = await reg.pushManager.getSubscription();
-    const subscription = existing || await reg.pushManager.subscribe({
+    if (existing) await existing.unsubscribe();
+    const subscription = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     });
@@ -491,18 +495,32 @@ async function suscribirAdminPush() {
     });
 
     document.getElementById('bannerPush').style.display = 'none';
-    toast('🔔 Notificaciones activadas', 'success', 3000);
+    actualizarBotonNotif(true);
+    toast('Notificaciones activadas', 'success', 3000);
   } catch (err) {
-    console.warn('Push admin no disponible:', err.message);
-    document.getElementById('bannerPush').style.display = 'block';
+    console.warn('Push admin error:', err.message);
+    toast('Error al activar notificaciones', 'error', 4000);
+  }
+}
+
+function actualizarBotonNotif(activo) {
+  const btn   = document.getElementById('sbNotifBtn');
+  const label = document.getElementById('sbNotifLabel');
+  if (!btn) return;
+  if (activo) {
+    btn.classList.add('activo');
+    if (label) label.textContent = 'Alertas activas';
+  } else {
+    btn.classList.remove('activo');
+    if (label) label.textContent = 'Activar alertas';
   }
 }
 
 function verificarEstadoPush() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-  if (Notification.permission !== 'granted') {
-    document.getElementById('bannerPush').style.display = 'block';
-  }
+  const activo = Notification.permission === 'granted';
+  document.getElementById('bannerPush').style.display = activo ? 'none' : 'block';
+  actualizarBotonNotif(activo);
 }
 
 function urlBase64ToUint8Array(base64String) {

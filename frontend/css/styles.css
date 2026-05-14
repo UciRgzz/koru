@@ -2237,6 +2237,10 @@ body {
     color: #5EEAD4;
     font-weight: 600;
   }
+  .sb-notif-btn { color: rgba(167,139,250,.7); }
+  .sb-notif-btn:hover { background: rgba(124,58,237,.12) !important; color: #C4B5FD; }
+  .sb-notif-btn.activo { color: #86EFAC; }
+  .sb-notif-btn.activo:hover { background: rgba(34,197,94,.1) !important; color: #86EFAC; }
   .sb-salir-btn { color: rgba(252,165,165,.55); }
   .sb-salir-btn:hover {
     background: rgba(239,68,68,.1) !important;
