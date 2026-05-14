@@ -95,12 +95,13 @@ function usarUbicacion() {
   if (!navigator.geolocation) { toast('Tu navegador no soporta geolocalización', 'warning'); return; }
   btn.textContent = '⏳';
   btn.disabled = true;
+  toast('📍 Detectando tu ubicación…', 'info', 3000);
   navigator.geolocation.getCurrentPosition(
     async ({ coords }) => {
       _coordenadasGPS = `${coords.latitude},${coords.longitude}`;
       try {
         const res  = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=es`,
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=es&zoom=18&addressdetails=1`,
           { headers: { 'User-Agent': 'KORUBebidas/1.0' } }
         );
         const data = await res.json();
@@ -112,16 +113,26 @@ function usarUbicacion() {
           'Oaxaca':'OAX','Guerrero':'GRO','Michoacán de Ocampo':'MICH','Puebla':'PUE',
         };
         const abrev   = estados[a.state] || (a.state ? a.state.substring(0,3).toUpperCase() : '');
-        const calle   = a.road || a.pedestrian || a.footway || a.residential || '';
+        const calle   = a.road || a.pedestrian || a.footway || a.residential || a.path || a.service || '';
         const numero  = a.house_number || '';
         const calleNum = calle ? (numero ? `${calle} ${numero}` : calle) : '';
-        const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || '';
-        const ciudad   = a.city || a.town || a.village || a.municipality || '';
+        const colonia  = a.suburb || a.neighbourhood || a.quarter || a.hamlet || a.village || a.isolated_dwelling || '';
+        const ciudad   = a.city || a.town || a.municipality || a.county || '';
         const ciudadNL = ciudad ? `${ciudad}${abrev ? ' '+abrev : ''}` : '';
 
-        // Construir desde las partes más específicas disponibles
         const partes = [calleNum, colonia, ciudadNL].filter(Boolean);
-        const dir = partes.length >= 2 ? partes.join(', ') : ciudadNL || ciudad;
+        let dir;
+        if (partes.length >= 2) {
+          dir = partes.join(', ');
+        } else {
+          // Usar display_name quitando país y código postal para mayor detalle
+          const excluir = ['Mexico', 'México', 'MX'];
+          const displayParts = (data.display_name || '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s && !/^\d{4,6}$/.test(s) && !excluir.includes(s));
+          dir = displayParts.slice(0, 3).join(', ') || ciudadNL || ciudad;
+        }
 
         document.getElementById('clienteDireccion').value = dir;
         toast('📍 Ubicación detectada', 'success');
@@ -133,11 +144,15 @@ function usarUbicacion() {
       }
     },
     (err) => {
-      toast('No se pudo acceder a la ubicación', 'warning');
+      if (err.code === 1) {
+        toast('Permiso de ubicación denegado. Toca el 📍 para intentar de nuevo.', 'warning', 5000);
+      } else {
+        toast('No se pudo acceder a la ubicación', 'warning');
+      }
       btn.textContent = '📍';
       btn.disabled = false;
     },
-    { enableHighAccuracy: true, timeout: 15000 }
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
   );
 }
 
@@ -257,9 +272,6 @@ function abrirCarrito() {
   cargarDatosGuardados();
   document.getElementById('carritoPanel').classList.add('abierto');
   document.getElementById('overlay').classList.add('visible');
-  if (!localStorage.getItem('koru_direccion')) {
-    usarUbicacion();
-  }
 }
 function cerrarCarrito() {
   document.getElementById('carritoPanel').classList.remove('abierto');
