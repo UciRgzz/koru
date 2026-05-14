@@ -269,6 +269,7 @@
       padding: 1.2rem;
       border-radius: 12px 12px 0 0;
     }
+    .ri-header img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; margin-bottom: .4rem; border: 2px solid rgba(255,255,255,.4); }
     .ri-header h1 { font-size: 1.4rem; margin: .3rem 0 .1rem; }
     .ri-header p  { font-size: .75rem; opacity: .8; margin: 0; }
     .ri-body { border: 1px solid #ddd; border-top: none; border-radius: 0 0 12px 12px; padding: 1rem; }
@@ -402,6 +403,7 @@
   <!-- Plantilla de recibo (solo visible al imprimir/descargar) -->
   <div id="reciboImprimible">
     <div class="ri-header">
+      <img src="/img/Koru_logo.jpeg" alt="KORU" crossorigin="anonymous" />
       <h1>KORU</h1>
       <p>Tapiocas Estilo Sago Tailandés</p>
     </div>
@@ -421,6 +423,7 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/tracking.js"></script>
 </body>

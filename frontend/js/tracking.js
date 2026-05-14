@@ -198,9 +198,27 @@ async function descargarRecibo() {
 
     document.getElementById('riTotal').textContent = `$${Number(p.total).toFixed(2)}`;
 
-    window.print();
+    // Mostrar fuera de pantalla para que html2canvas lo capture
+    const el = document.getElementById('reciboImprimible');
+    el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:320px;background:#fff;';
+
+    const canvas = await html2canvas(el, {
+      scale: 2.5,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    el.style.cssText = 'display:none';
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `recibo-${numeroPedido}.png`;
+    a.click();
+
+    toast('✅ Recibo descargado', 'success', 3000);
   } catch (err) {
-    toast('Error al obtener el recibo', 'error');
+    toast('Error al obtener el recibo: ' + err.message, 'error');
   }
 }
 
