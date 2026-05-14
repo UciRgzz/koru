@@ -57,6 +57,26 @@
     🔔 Toca aquí para activar notificaciones de pedidos en tu teléfono
   </div>
 
+  <!-- Sidebar de navegación (visible solo en móvil) -->
+  <nav class="sidebar-mobile" id="sidebarMobile">
+    <img src="img/Koru_logo.jpeg" alt="KORU" class="sidebar-logo" onerror="this.style.display='none'" />
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-btn active" id="sbTablero" onclick="mostrarTab('tablero', null)">
+      <span class="sb-icon">📊</span><span>Tablero</span>
+    </button>
+    <button class="sidebar-btn" id="sbPedidos" onclick="mostrarTab('pedidos', null)">
+      <span class="sb-icon">📋</span><span>Pedidos</span>
+    </button>
+    <button class="sidebar-btn" id="sbComprobantes" onclick="mostrarTab('comprobantes', null)">
+      <span class="sb-icon">🧾</span><span>Vouchers</span>
+    </button>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-conexion" id="sidebarConexion">⚪</div>
+    <button class="sidebar-btn sb-salir" onclick="cerrarSesion()">
+      <span class="sb-icon">🚪</span><span>Salir</span>
+    </button>
+  </nav>
+
   <main class="admin-main">
 
     <!-- TAB: Tablero en tiempo real -->

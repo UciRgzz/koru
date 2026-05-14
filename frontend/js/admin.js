@@ -54,8 +54,11 @@ socket.on('whatsapp_enviado', () => {
 function mostrarTab(nombre, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab${nombre.charAt(0).toUpperCase() + nombre.slice(1)}`).classList.add('active');
   if (btn) btn.classList.add('active');
+  const sbMap = { tablero: 'sbTablero', pedidos: 'sbPedidos', comprobantes: 'sbComprobantes' };
+  if (sbMap[nombre]) document.getElementById(sbMap[nombre])?.classList.add('active');
   if (nombre === 'comprobantes') cargarComprobantes();
   if (nombre === 'pedidos') cargarPedidos();
 }
@@ -433,7 +436,11 @@ function cerrarModalComprobante() {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-function setEstado(texto) { document.getElementById('estadoConexion').textContent = texto; }
+function setEstado(texto) {
+  document.getElementById('estadoConexion').textContent = texto;
+  const dot = document.getElementById('sidebarConexion');
+  if (dot) dot.textContent = texto.includes('🟢') ? '🟢' : texto.includes('🔴') ? '🔴' : '⚪';
+}
 
 function notificarNuevoPedido(numero) {
   if ('Notification' in window && Notification.permission === 'granted') {
