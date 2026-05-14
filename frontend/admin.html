@@ -11,6 +11,25 @@
   <meta name="apple-mobile-web-app-title" content="KORU Admin" />
   <link rel="apple-touch-icon" href="/img/Koru_logo.jpeg" />
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ── Recibo admin (mismo estilo que tracking) ── */
+    #reciboRender { position:fixed; left:-9999px; top:0; z-index:-1; pointer-events:none; width:320px; }
+    #reciboRender .ri-wrap { position:relative; width:320px; font-family:'Poppins',sans-serif; border-radius:18px; overflow:hidden; }
+    #reciboRender .ri-bg { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:fill; z-index:0; }
+    #reciboRender .ri-content { position:relative; z-index:1; padding:205px 1.4rem 1.8rem; }
+    #reciboRender .ri-title { text-align:center; color:#E91E8C; font-weight:800; font-size:.78rem; letter-spacing:.13em; margin-bottom:.35rem; }
+    #reciboRender .ri-num { text-align:center; font-weight:800; color:#1a1a1a; font-size:1rem; margin:0 0 .1rem; }
+    #reciboRender .ri-fecha { text-align:center; color:#999; font-size:.7rem; margin-bottom:.65rem; }
+    #reciboRender .ri-sep { border:none; border-top:1.5px dashed #ddd; margin:.55rem 0; }
+    #reciboRender .ri-fila { display:flex; align-items:center; gap:.45rem; padding:.22rem 0; font-size:.77rem; }
+    #reciboRender .ri-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; flex-shrink:0; }
+    #reciboRender .ri-label { color:#888; flex:1; }
+    #reciboRender .ri-val { font-weight:600; color:#333; text-align:right; max-width:55%; }
+    #reciboRender .ri-item { display:flex; justify-content:space-between; font-size:.78rem; padding:.18rem 0; color:#444; }
+    #reciboRender .ri-total-row { display:flex; justify-content:space-between; font-weight:800; font-size:.95rem; padding:.5rem 0 .3rem; border-top:2px solid #0A5C56; margin-top:.25rem; color:#0A5C56; }
+    #reciboRender .ri-gracias { text-align:center; color:#aaa; font-size:.7rem; margin-top:.5rem; }
+    #reciboRender .ri-footer { text-align:center; margin-top:.3rem; font-weight:800; font-size:.8rem; color:#0A5C56; }
+  </style>
 </head>
 <body class="admin-body">
   <header class="header">
@@ -165,22 +184,25 @@
   </div>
 
   <!-- Plantilla oculta del comprobante imagen -->
-  <div id="reciboRender" style="position:fixed;left:-9999px;top:0;z-index:-1;pointer-events:none">
-    <div class="recibo-card">
-      <div class="recibo-header">
-        <img id="reciboLogo" src="img/Koru_logo.jpeg" alt="KORU" crossorigin="anonymous" />
-        <h2>KORU</h2>
-        <p>Tapiocas Estilo Sago Tailandés</p>
+  <div id="reciboRender">
+    <div class="ri-wrap">
+      <img class="ri-bg" src="/img/recibo_img.png" crossorigin="anonymous" />
+      <div class="ri-content">
+        <div class="ri-title">✦ &nbsp;RECIBO DE PAGO&nbsp; ✦</div>
+        <div class="ri-num"   id="reciboNumero"></div>
+        <div class="ri-fecha" id="reciboFecha"></div>
+        <hr class="ri-sep">
+        <div class="ri-fila"><span class="ri-icon" style="background:#FDE8F5">🔒</span><span class="ri-label">Cliente</span><span class="ri-val" id="arCliente"></span></div>
+        <div class="ri-fila"><span class="ri-icon" style="background:#E8F5FD">📞</span><span class="ri-label">Teléfono</span><span class="ri-val" id="arTel"></span></div>
+        <div class="ri-fila" id="arDirFila"><span class="ri-icon" style="background:#FDF5E8">📍</span><span class="ri-label">Dirección</span><span class="ri-val" id="arDir"></span></div>
+        <div class="ri-fila"><span class="ri-icon" style="background:#E8FDF0">🧾</span><span class="ri-label">Pago</span><span class="ri-val" id="arPago"></span></div>
+        <div class="ri-fila" id="arLecheFila"><span class="ri-icon" style="background:#F5E8FD">🥛</span><span class="ri-label">Leche</span><span class="ri-val" id="arLeche"></span></div>
+        <hr class="ri-sep">
+        <div id="reciboItems"></div>
+        <div class="ri-total-row"><span>TOTAL</span><span id="reciboTotal"></span></div>
+        <p class="ri-gracias">¡Gracias por tu compra! 🩷</p>
+        <div class="ri-footer">K🌿RU</div>
       </div>
-      <div class="recibo-numero" id="reciboNumero"></div>
-      <div class="recibo-fecha"  id="reciboFecha"></div>
-      <div class="recibo-separator"></div>
-      <div class="recibo-datos"  id="reciboDatos"></div>
-      <div class="recibo-separator dashed"></div>
-      <div class="recibo-items"  id="reciboItems"></div>
-      <div class="recibo-separator"></div>
-      <div id="reciboTotal"></div>
-      <div class="recibo-footer">¡Gracias por tu compra! 🧋<br>Vuelve pronto · KORU</div>
     </div>
   </div>
 

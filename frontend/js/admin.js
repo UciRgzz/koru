@@ -365,31 +365,36 @@ let _compBlob = null;
 let _compTel  = '';
 
 async function generarComprobanteImagen(p) {
-  // Poblar plantilla
-  document.getElementById('reciboNumero').textContent = `#${p.numero_pedido}`;
+  const shortNum = p.numero_pedido.split('-').pop();
+  document.getElementById('reciboNumero').textContent = `Pedido #${shortNum}`;
   document.getElementById('reciboFecha').textContent  =
     new Date(p.creado_en).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 
-  document.getElementById('reciboDatos').innerHTML = [
-    `<div class="recibo-fila"><span>Cliente</span><span>${p.cliente_nombre}</span></div>`,
-    `<div class="recibo-fila"><span>Teléfono</span><span>${p.cliente_telefono}</span></div>`,
-    p.direccion ? `<div class="recibo-fila"><span>Dirección</span><span>${p.direccion}</span></div>` : '',
-    `<div class="recibo-fila"><span>Pago</span><span>${p.metodo_pago === 'transferencia' ? '📱 Transferencia' : '💵 Efectivo'}</span></div>`,
-    p.tipo_leche ? `<div class="recibo-fila"><span>Leche</span><span>${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</span></div>` : '',
-  ].join('');
+  document.getElementById('arCliente').textContent = p.cliente_nombre;
+  document.getElementById('arTel').textContent     = p.cliente_telefono;
+
+  const dirFila = document.getElementById('arDirFila');
+  if (p.direccion) { document.getElementById('arDir').textContent = p.direccion; dirFila.style.display = 'flex'; }
+  else { dirFila.style.display = 'none'; }
+
+  const leches = { carnation:'Leche Carnation', condensada:'Leche Condensada', almendra:'Almendra', soya:'Soya', coco:'Coco' };
+  const lecheFila = document.getElementById('arLecheFila');
+  if (p.tipo_leche) { document.getElementById('arLeche').textContent = leches[p.tipo_leche] || p.tipo_leche; lecheFila.style.display = 'flex'; }
+  else { lecheFila.style.display = 'none'; }
+
+  document.getElementById('arPago').textContent = p.metodo_pago === 'transferencia' ? 'Transferencia' : 'Efectivo';
 
   document.getElementById('reciboItems').innerHTML = (p.items || []).map(i =>
-    `<div class="recibo-item"><span>${i.cantidad}x ${i.nombre}</span><span>$${Number(i.subtotal).toFixed(2)}</span></div>`
+    `<div class="ri-item"><span>${i.cantidad}x ${i.nombre}</span><span>$${Number(i.subtotal).toFixed(2)}</span></div>`
   ).join('');
 
-  document.getElementById('reciboTotal').innerHTML =
-    `<div class="recibo-total-row"><span>TOTAL</span><span>$${Number(p.total).toFixed(2)}</span></div>`;
+  document.getElementById('reciboTotal').textContent = `$${Number(p.total).toFixed(2)}`;
 
   _compTel = (p.cliente_telefono || '').replace(/\D/g, '');
 
-  const el = document.querySelector('#reciboRender .recibo-card');
+  const el = document.querySelector('#reciboRender .ri-wrap');
   try {
-    const canvas = await html2canvas(el, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false });
+    const canvas = await html2canvas(el, { scale: 2.5, useCORS: true, backgroundColor: null, logging: false });
 
     // Preview en modal
     const img = new Image();
