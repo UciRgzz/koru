@@ -125,13 +125,13 @@ function usarUbicacion() {
       } catch {
         toast('No se pudo convertir la ubicación', 'error');
       } finally {
-        btn.textContent = '🎯';
+        btn.textContent = '📍';
         btn.disabled = false;
       }
     },
     (err) => {
       toast('No se pudo acceder a la ubicación', 'warning');
-      btn.textContent = '🎯';
+      btn.textContent = '📍';
       btn.disabled = false;
     },
     { enableHighAccuracy: true, timeout: 15000 }
