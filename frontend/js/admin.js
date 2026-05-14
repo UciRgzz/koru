@@ -16,11 +16,19 @@ const socket = io();
 let pedidos = {};      // estado del tablero
 let pedidoActualId = null;
 
+let _primeraConexion = true;
 socket.on('connect', () => {
   socket.emit('unirse', 'admin');
   setEstado('🟢 Conectado');
+  if (!_primeraConexion) iniciarTablero();
+  _primeraConexion = false;
 });
 socket.on('disconnect', () => setEstado('🔴 Desconectado'));
+
+// Cuando la app vuelve al frente en iPhone, recargar pedidos
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) iniciarTablero();
+});
 
 socket.on('nuevo_pedido', (pedido) => {
   pedidos[pedido.id] = pedido;
