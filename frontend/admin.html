@@ -202,7 +202,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/security.js"></script>
   <script>
+    // Forzar re-verificación de auth al volver con el botón atrás (BFCache)
+    window.addEventListener('pageshow', e => {
+      if (!localStorage.getItem('token')) window.location.replace('/login');
+    });
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then(() => console.log('SW registrado'))

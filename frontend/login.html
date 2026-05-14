@@ -363,7 +363,7 @@
         if (!json.ok) { errorMsg.textContent = json.mensaje; return; }
         localStorage.setItem('token', json.token);
         localStorage.setItem('usuario', JSON.stringify(json.usuario));
-        window.location.href = '/admin';
+        window.location.replace('/admin');
       } catch {
         errorMsg.textContent = 'Error de conexión. Intenta de nuevo.';
       } finally {
