@@ -438,8 +438,24 @@ function cerrarModalComprobante() {
 // ── Helpers ───────────────────────────────────────────────────
 function setEstado(texto) {
   document.getElementById('estadoConexion').textContent = texto;
-  const dot = document.getElementById('sidebarConexion');
-  if (dot) dot.textContent = texto.includes('🟢') ? '🟢' : texto.includes('🔴') ? '🔴' : '⚪';
+  const dot  = document.getElementById('sidebarDot');
+  const stxt = document.getElementById('sidebarStatusText');
+  if (!dot) return;
+  dot.className = 'sb-dot-indicator';
+  if (texto.includes('🟢')) { dot.classList.add('connected');    if (stxt) stxt.textContent = 'Conectado'; }
+  else if (texto.includes('🔴')) { dot.classList.add('disconnected'); if (stxt) stxt.textContent = 'Desconectado'; }
+  else { if (stxt) stxt.textContent = 'Conectando...'; }
+}
+
+function openSidebar() {
+  document.getElementById('sidebarMobile').classList.add('open');
+  document.getElementById('sbOverlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebarMobile').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 function notificarNuevoPedido(numero) {
@@ -505,6 +521,8 @@ function actualizarReloj() {
 document.addEventListener('DOMContentLoaded', () => {
   const infoEl = document.getElementById('usuarioInfo');
   if (infoEl && usuarioActual) infoEl.textContent = `👤 ${usuarioActual.nombre}`;
+  const sbUser = document.getElementById('sbUsuarioInfo');
+  if (sbUser && usuarioActual) sbUser.textContent = usuarioActual.nombre;
 });
 
 verificarEstadoPush();
