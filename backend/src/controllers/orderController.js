@@ -13,7 +13,7 @@ async function crearPedido(req, res) {
   const conn = await db.connect();
   try {
     await conn.query('BEGIN');
-    const { nombre, telefono, notas, metodo_pago, direccion, tipo_leche, extra_leche } = req.body;
+    const { nombre, telefono, notas, metodo_pago, direccion, tipo_leche, extra_leche, coordenadas } = req.body;
     // items llega como JSON string cuando se envía con FormData
     const items = typeof req.body.items === 'string'
       ? JSON.parse(req.body.items)
@@ -79,8 +79,8 @@ async function crearPedido(req, res) {
     const metodoPagoFinal = metodosValidos.includes(metodo_pago) ? metodo_pago : 'efectivo';
 
     const { rows: pedidoRows } = await conn.query(
-      'INSERT INTO pedidos (numero_pedido, cliente_id, notas, total, metodo_pago, comprobante_url, direccion, tipo_leche) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',
-      [numeroPedido, clienteId, notas || null, total, metodoPagoFinal, comprobanteUrl, direccion || null, tipo_leche || null]
+      'INSERT INTO pedidos (numero_pedido, cliente_id, notas, total, metodo_pago, comprobante_url, direccion, tipo_leche, coordenadas) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id',
+      [numeroPedido, clienteId, notas || null, total, metodoPagoFinal, comprobanteUrl, direccion || null, tipo_leche || null, coordenadas || null]
     );
     const pedidoId = pedidoRows[0].id;
 

@@ -88,6 +88,8 @@ function editarDireccion() {
   document.getElementById('clienteDireccion').focus();
 }
 
+let _coordenadasGPS = null;
+
 function usarUbicacion() {
   const btn = document.getElementById('btnGps');
   if (!navigator.geolocation) { toast('Tu navegador no soporta geolocalización', 'warning'); return; }
@@ -95,6 +97,7 @@ function usarUbicacion() {
   btn.disabled = true;
   navigator.geolocation.getCurrentPosition(
     async ({ coords }) => {
+      _coordenadasGPS = `${coords.latitude},${coords.longitude}`;
       try {
         const res  = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=es`,
@@ -298,6 +301,7 @@ async function enviarPedido() {
     formData.append('tipo_leche', tipoLeche);
     formData.append('extra_leche', extraLeche);
     if (notas) formData.append('notas', notas);
+    if (_coordenadasGPS) formData.append('coordenadas', _coordenadasGPS);
     formData.append('items', JSON.stringify(
       carrito.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad }))
     ));

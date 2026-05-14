@@ -133,7 +133,7 @@ function renderCardTablero(p) {
         ${p.cliente_telefono ? `<a href="tel:${p.cliente_telefono}" class="btn-llamar" title="Llamar cliente">📞</a>` : ''}
       </div>
       ${p.tipo_leche && p.tipo_leche !== 'clasica' ? `<div class="cocina-mesa" style="color:#7C3AED;font-weight:700">🥛 Leche de ${p.tipo_leche.charAt(0).toUpperCase()+p.tipo_leche.slice(1)} (+$5)</div>` : ''}
-      ${p.direccion ? `<div class="cocina-mesa" style="color:#2980b9;font-weight:600">📍 ${p.direccion}</div>` : ''}
+      ${p.direccion ? `<div class="cocina-mesa" style="color:#2980b9;font-weight:600">📍 ${p.direccion}${p.coordenadas ? ` <a href="https://maps.google.com/?q=${p.coordenadas}" target="_blank" style="color:#E91E8C;font-size:.75rem;margin-left:.4rem;text-decoration:none">🗺 Ver mapa</a>` : ''}</div>` : ''}
       ${p.notas ? `<div class="cocina-mesa" style="color:#f39c12">📝 ${p.notas}</div>` : ''}
       ${p.comprobante_url ? `<div class="comp-badge" onclick="verComprobante('${p.comprobante_url}')">🧾 Ver comprobante</div>` : ''}
       <div style="margin:.5rem 0;font-size:.85rem">${items}</div>
@@ -252,7 +252,7 @@ async function verDetalle(id) {
   document.getElementById('modalCuerpo').innerHTML = `
     <p><strong>Cliente:</strong> ${p.cliente_nombre} | ${p.cliente_telefono}</p>
     ${p.tipo_leche ? `<p style="color:#7C3AED;font-weight:600"><strong>🥛 Leche:</strong> ${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</p>` : ''}
-    ${p.direccion ? `<p style="color:#2471a3"><strong>📍 Dirección:</strong> ${p.direccion}</p>` : ''}
+    ${p.direccion ? `<p style="color:#2471a3"><strong>📍 Dirección:</strong> ${p.direccion}${p.coordenadas ? ` <a href="https://maps.google.com/?q=${p.coordenadas}" target="_blank" style="display:inline-block;background:#E91E8C;color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px;text-decoration:none;margin-left:.5rem;font-weight:600">🗺 Abrir en Maps</a>` : ''}</p>` : ''}
     <p><strong>Método de pago:</strong> ${iconoPago(p.metodo_pago)}</p>
     ${p.notas ? `<p><strong>Notas:</strong> ${p.notas}</p>` : ''}
     ${p.comprobante_url ? `
