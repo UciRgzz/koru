@@ -1,5 +1,5 @@
 const router  = require('express').Router();
-const { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen, getRecibo } = require('../controllers/orderController');
+const { crearPedido, getPedidos, getPedido, actualizarEstado, actualizarMetodoPago, getEstadoPedido, enviarComprobanteImagen, getRecibo } = require('../controllers/orderController');
 const { verificarToken } = require('../middleware/auth');
 const upload   = require('../middleware/upload');
 
@@ -15,7 +15,8 @@ router.get('/recibo/:numero', getRecibo);
 // GET y PATCH: solo admin autenticado
 router.get('/',    verificarToken, getPedidos);
 router.get('/:id', verificarToken, getPedido);
-router.patch('/:id/estado', verificarToken, actualizarEstado);
+router.patch('/:id/estado',        verificarToken, actualizarEstado);
+router.patch('/:id/metodo-pago',   verificarToken, actualizarMetodoPago);
 
 // POST: enviar imagen del comprobante al cliente por WhatsApp (Twilio)
 router.post('/:id/enviar-comprobante', verificarToken, upload.generado.single('imagen'), enviarComprobanteImagen);

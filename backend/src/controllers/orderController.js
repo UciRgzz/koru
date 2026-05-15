@@ -253,4 +253,23 @@ async function getRecibo(req, res) {
   }
 }
 
-module.exports = { crearPedido, getPedidos, getPedido, actualizarEstado, getEstadoPedido, enviarComprobanteImagen, getRecibo };
+async function actualizarMetodoPago(req, res) {
+  try {
+    const { metodo_pago } = req.body;
+    const metodosValidos = ['efectivo', 'tarjeta', 'transferencia'];
+    if (!metodosValidos.includes(metodo_pago)) {
+      return res.status(400).json({ ok: false, mensaje: 'Método de pago no válido' });
+    }
+    const { rowCount } = await db.query(
+      'UPDATE pedidos SET metodo_pago = $1 WHERE id = $2',
+      [metodo_pago, req.params.id]
+    );
+    if (!rowCount) return res.status(404).json({ ok: false, mensaje: 'Pedido no encontrado' });
+    const pedido = await getPedidoCompleto(req.params.id);
+    res.json({ ok: true, data: pedido });
+  } catch (err) {
+    res.status(500).json({ ok: false, mensaje: err.message });
+  }
+}
+
+module.exports = { crearPedido, getPedidos, getPedido, actualizarEstado, actualizarMetodoPago, getEstadoPedido, enviarComprobanteImagen, getRecibo };

@@ -256,7 +256,15 @@ async function verDetalle(id) {
     <p><strong>Cliente:</strong> ${p.cliente_nombre} | ${p.cliente_telefono}</p>
     ${p.tipo_leche ? `<p style="color:#7C3AED;font-weight:600"><strong>🥛 Leche:</strong> ${p.tipo_leche === 'carnation' ? 'Leche Carnation' : 'Leche Condensada'}</p>` : ''}
     ${p.direccion ? `<p style="color:#2471a3"><strong>📍 Dirección:</strong> ${p.direccion}${p.coordenadas ? ` <a href="https://maps.google.com/?q=${p.coordenadas}" target="_blank" style="display:inline-block;background:#E91E8C;color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px;text-decoration:none;margin-left:.5rem;font-weight:600">🗺 Abrir en Maps</a>` : ''}</p>` : ''}
-    <p><strong>Método de pago:</strong> ${iconoPago(p.metodo_pago)}</p>
+    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:.3rem 0">
+      <strong>Método de pago:</strong>
+      <select id="selectMetodoPago" style="border:1.5px solid #E2E8F0;border-radius:8px;padding:.3rem .7rem;font-family:Poppins,sans-serif;font-size:.83rem;color:#374151;background:#F8FAFC;cursor:pointer">
+        <option value="efectivo"      ${p.metodo_pago==='efectivo'      ?'selected':''}>💵 Efectivo</option>
+        <option value="transferencia" ${p.metodo_pago==='transferencia' ?'selected':''}>🏦 Transferencia</option>
+        <option value="tarjeta"       ${p.metodo_pago==='tarjeta'       ?'selected':''}>💳 Tarjeta</option>
+      </select>
+      <button onclick="cambiarMetodoPago(${p.id})" style="background:#0E6B6B;color:white;border:none;padding:.32rem .85rem;border-radius:8px;font-size:.78rem;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer">Guardar</button>
+    </div>
     ${p.notas ? `<p><strong>Notas:</strong> ${p.notas}</p>` : ''}
     ${p.comprobante_url ? `
       <div style="margin:.8rem 0">
@@ -297,6 +305,22 @@ async function cambiarEstadoDesdeModal(id, estado) {
   await cambiarEstadoTablero(id, estado);
   cerrarModalDetalle();
   cargarPedidos();
+}
+
+async function cambiarMetodoPago(id) {
+  const metodo = document.getElementById('selectMetodoPago').value;
+  const res = await fetch(`/api/pedidos/${id}/metodo-pago`, {
+    method: 'PATCH',
+    headers: authHeader(),
+    body: JSON.stringify({ metodo_pago: metodo }),
+  });
+  const json = await res.json();
+  if (!json.ok) { toast('Error al cambiar método de pago', 'error'); return; }
+  pedidos[id] = json.data;
+  renderTablero();
+  cargarPedidos();
+  toast('Método de pago actualizado', 'success', 2500);
+  verDetalle(id);
 }
 
 function cerrarModalDetalle() {
