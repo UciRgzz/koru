@@ -261,7 +261,6 @@ async function verDetalle(id) {
       <select id="selectMetodoPago" style="border:1.5px solid #E2E8F0;border-radius:8px;padding:.3rem .7rem;font-family:Poppins,sans-serif;font-size:.83rem;color:#374151;background:#F8FAFC;cursor:pointer">
         <option value="efectivo"      ${p.metodo_pago==='efectivo'      ?'selected':''}>💵 Efectivo</option>
         <option value="transferencia" ${p.metodo_pago==='transferencia' ?'selected':''}>🏦 Transferencia</option>
-        <option value="tarjeta"       ${p.metodo_pago==='tarjeta'       ?'selected':''}>💳 Tarjeta</option>
       </select>
       <button onclick="cambiarMetodoPago(${p.id})" style="background:#0E6B6B;color:white;border:none;padding:.32rem .85rem;border-radius:8px;font-size:.78rem;font-weight:600;font-family:Poppins,sans-serif;cursor:pointer">Guardar</button>
     </div>
