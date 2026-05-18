@@ -1,15 +1,25 @@
 // ── Autenticación ─────────────────────────────────────────────
 const token = localStorage.getItem('token');
 const usuarioActual = JSON.parse(localStorage.getItem('usuario') || 'null');
-if (!token || !usuarioActual) { window.location.href = '/login'; }
+if (!token || !usuarioActual) { window.location.replace('/login'); }
 
 function authHeader() {
   return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 }
 function cerrarSesion() {
   localStorage.clear();
-  window.location.href = '/login';
+  window.location.replace('/login');
 }
+
+// Verificar que el token sigue siendo válido en el servidor
+(async function verificarSesion() {
+  try {
+    const res = await fetch('/api/auth/verify', { headers: authHeader() });
+    if (!res.ok) { localStorage.clear(); window.location.replace('/login'); }
+  } catch {
+    localStorage.clear(); window.location.replace('/login');
+  }
+})();
 
 // ── Socket.io ─────────────────────────────────────────────────
 const socket = io();
