@@ -2,11 +2,21 @@ const db = require('../config/database');
 const { notificarCliente, notificarAdmin } = require('../services/pushService');
 const { enviarImagenWhatsApp } = require('../services/twilioService');
 
-function generarNumeroPedido() {
-  const fecha = new Date();
-  const prefijo = `P${fecha.getFullYear()}${String(fecha.getMonth() + 1).padStart(2, '0')}${String(fecha.getDate()).padStart(2, '0')}`;
-  const random = Math.floor(Math.random() * 9000) + 1000;
-  return `${prefijo}-${random}`;
+// Número de pedido: DD (día del mes, hora de Monterrey) + NN (consecutivo del día, reinicia a 01).
+// Ej: 10° día del mes, primer pedido -> "1001", segundo -> "1002" ... al día siguiente -> "1101".
+async function generarNumeroPedido(conn) {
+  const { rows } = await conn.query(`
+    SELECT
+      to_char(NOW() AT TIME ZONE 'America/Monterrey', 'DD') AS dia,
+      COUNT(*) FILTER (
+        WHERE (creado_en AT TIME ZONE 'America/Monterrey')::date
+            = (NOW() AT TIME ZONE 'America/Monterrey')::date
+      )::int AS pedidos_hoy
+    FROM pedidos
+  `);
+  const { dia, pedidos_hoy } = rows[0];
+  const siguiente = String(pedidos_hoy + 1).padStart(2, '0');
+  return `${dia}${siguiente}`;
 }
 
 async function crearPedido(req, res) {
@@ -74,7 +84,7 @@ async function crearPedido(req, res) {
     if (cargoLeche > 0) total += cargoLeche;
 
     // Crear pedido
-    const numeroPedido = generarNumeroPedido();
+    const numeroPedido = await generarNumeroPedido(conn);
     const metodosValidos = ['efectivo', 'tarjeta', 'transferencia'];
     const metodoPagoFinal = metodosValidos.includes(metodo_pago) ? metodo_pago : 'efectivo';
 

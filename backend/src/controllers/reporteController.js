@@ -39,7 +39,7 @@ async function descargarReporteSemanal(req, res) {
     hojaPedidos.getRow(1).font = { bold: true };
     pedidos.forEach(p => hojaPedidos.addRow({
       ...p,
-      creado_en: new Date(p.creado_en).toLocaleString('es-MX'),
+      creado_en: new Date(p.creado_en).toLocaleString('es-MX', { timeZone: 'America/Monterrey' }),
       total: Number(p.total),
     }));
 
