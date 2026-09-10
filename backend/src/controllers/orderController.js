@@ -4,19 +4,24 @@ const { enviarImagenWhatsApp } = require('../services/twilioService');
 
 // Número de pedido: DD (día del mes, hora de Monterrey) + NN (consecutivo del día, reinicia a 01).
 // Ej: 10° día del mes, primer pedido -> "1001", segundo -> "1002" ... al día siguiente -> "1101".
+// El mismo "DDNN" se repite cada mes, así que antes de asignarlo se comprueba que no
+// siga existiendo de un mes anterior (por si no se ha hecho la limpieza semanal) y,
+// si ya está usado, se salta al siguiente consecutivo libre.
 async function generarNumeroPedido(conn) {
-  const { rows } = await conn.query(`
-    SELECT
-      to_char(NOW() AT TIME ZONE 'America/Monterrey', 'DD') AS dia,
-      COUNT(*) FILTER (
-        WHERE (creado_en AT TIME ZONE 'America/Monterrey')::date
-            = (NOW() AT TIME ZONE 'America/Monterrey')::date
-      )::int AS pedidos_hoy
-    FROM pedidos
-  `);
-  const { dia, pedidos_hoy } = rows[0];
-  const siguiente = String(pedidos_hoy + 1).padStart(2, '0');
-  return `${dia}${siguiente}`;
+  const { rows } = await conn.query(
+    `SELECT to_char(NOW() AT TIME ZONE 'America/Monterrey', 'DD') AS dia`
+  );
+  const dia = rows[0].dia;
+
+  for (let n = 1; n <= 99; n++) {
+    const candidato = `${dia}${String(n).padStart(2, '0')}`;
+    const { rows: existe } = await conn.query(
+      'SELECT 1 FROM pedidos WHERE numero_pedido = $1', [candidato]
+    );
+    if (!existe.length) return candidato;
+  }
+  // Caso extremo: más de 99 pedidos ese día. No debería pasar en este negocio.
+  return `${dia}${Date.now().toString().slice(-4)}`;
 }
 
 async function crearPedido(req, res) {
