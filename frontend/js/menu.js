@@ -230,6 +230,7 @@ function agregarAlCarrito(productoId) {
   } else {
     carrito.push({ producto_id: prod.id, nombre: prod.nombre, precio: prod.precio, cantidad: 1 });
   }
+  toast(`Has añadido ${prod.nombre} al carrito`, 'success', 2000);
   actualizarUI();
 }
 
