@@ -590,3 +590,46 @@ document.getElementById('filtroPedidoFecha').value = fechaLocalHoy();
 document.getElementById('filtroCompFecha').value   = fechaLocalHoy();
 
 iniciarTablero();
+
+// ── Reporte semanal (Excel) + limpieza de pedidos cerrados ─────
+async function descargarYLimpiarSemana() {
+  const btns = document.querySelectorAll('.js-reporte-semanal');
+  btns.forEach(b => { b.disabled = true; });
+
+  try {
+    const res = await fetch('/api/pedidos/reporte/semanal', { headers: authHeader() });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.mensaje || 'No se pudo generar el reporte');
+    }
+    const blob = await res.blob();
+    const fecha = fechaLocalHoy();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `koru-reporte-${fecha}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('Reporte descargado correctamente.', 'success');
+
+    const confirmar = window.confirm(
+      '¿Ya guardaste el archivo Excel?\n\n' +
+      'Si confirmas, se borrarán PERMANENTEMENTE de la base de datos los pedidos ' +
+      'ENTREGADOS y CANCELADOS (los pedidos activos no se tocan).\n\n' +
+      'Esta acción no se puede deshacer.'
+    );
+    if (!confirmar) return;
+
+    const delRes = await fetch('/api/pedidos/reporte/semanal', { method: 'DELETE', headers: authHeader() });
+    const delJson = await delRes.json();
+    if (!delJson.ok) throw new Error(delJson.mensaje);
+    toast(delJson.mensaje, 'success');
+    cargarPedidos();
+  } catch (err) {
+    toast(`Error: ${err.message}`, 'error');
+  } finally {
+    btns.forEach(b => { b.disabled = false; });
+  }
+}
